@@ -171,13 +171,49 @@
     font-size: 28px;
   }
   .notion-hero .hero-text { flex: 1; min-width: 220px; }
+  .notion-hero .hero-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
   .notion-hero .hero-btn {
     background: white; color: var(--navy-dark);
     padding: 10px 18px; border-radius: 8px;
     text-decoration: none; font-weight: 600; font-size: 13.5px;
     transition: transform .12s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .notion-hero .hero-btn.secondary {
+    background: rgba(255,255,255,.15); color: white;
+    border: 1px solid rgba(255,255,255,.3);
   }
   .notion-hero .hero-btn:hover { transform: translateY(-1px); }
+  .filter-bar {
+    margin-bottom: 14px;
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-bar .filter-label {
+    font-size: 11.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .filter-chip {
+    font-size: 12px; padding: 4px 10px; border-radius: 14px;
+    background: var(--panel); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; user-select: none;
+    transition: all .12s;
+  }
+  .filter-chip:hover { border-color: var(--navy); }
+  .filter-chip.active {
+    background: var(--navy); color: white; border-color: var(--navy);
+    font-weight: 500;
+  }
+  .filter-chip.clear {
+    color: var(--muted); border-style: dashed;
+  }
+  .filter-chip.clear:hover { color: var(--danger); border-color: var(--danger); }
+  .proj-row .row-edited {
+    font-size: 11px; color: var(--muted);
+    margin-left: auto; white-space: nowrap;
+  }
   .proj-group { margin-bottom: 22px; }
   .proj-group h3 {
     font-size: 12px; font-weight: 600; text-transform: uppercase;
@@ -488,6 +524,23 @@
     return '';
   }
 
+  function relativeTime(iso) {
+    if (!iso) return '';
+    const then = new Date(iso);
+    if (isNaN(then.getTime())) return '';
+    const now = new Date();
+    const sec = Math.max(0, (now - then) / 1000);
+    if (sec < 60) return 'just now';
+    if (sec < 3600) return Math.floor(sec/60) + 'm ago';
+    if (sec < 86400) return Math.floor(sec/3600) + 'h ago';
+    if (sec < 86400 * 30) return Math.floor(sec/86400) + 'd ago';
+    return then.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function projectCustomers(p) {
+    if (!p.customer) return [];
+    return p.customer.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
   function renderProjectRow(p) {
     const search = [p.name, p.status, p.customer, p.lineSystem, p.category, p.priority, p.keyUpdate, p.description]
       .filter(Boolean).join(' ').toLowerCase();
@@ -497,10 +550,14 @@
     a.target = '_blank';
     a.rel = 'noopener';
     a.dataset.search = search;
+    a.dataset.customers = projectCustomers(p).join('||').toLowerCase();
+    a.dataset.edited = p.lastEdited || '';
 
     const pills = [];
     if (p.priority) pills.push(`<span class="pill ${prioClass(p.priority)}">${escapeHtml(p.priority)}</span>`);
     if (p.status) pills.push(`<span class="pill ${statusClass(p.status)}">${escapeHtml(p.status)}</span>`);
+    const edited = relativeTime(p.lastEdited);
+    if (edited) pills.push(`<span class="row-edited" title="${escapeAttr(p.lastEdited || '')}">${escapeHtml(edited)}</span>`);
 
     const metaParts = [];
     if (p.customer) metaParts.push('👥 ' + escapeHtml(p.customer));
@@ -541,25 +598,90 @@
     const hero = document.createElement('div');
     hero.className = 'notion-hero';
     const heroCount = notion && Array.isArray(notion.projects) ? notion.projects.length : 0;
+    const syncUrl = t.syncWorkflowUrl || '';
     hero.innerHTML = `
       <div class="hero-icon">📋</div>
       <div class="hero-text">
         <h2>${escapeHtml(t.heroTitle || 'Project Database')}${heroCount ? ` <span style="opacity:.7;font-weight:400;font-size:15px">· ${heroCount} active</span>` : ''}</h2>
         <p>${escapeHtml(t.heroText || 'Snapshot of your Notion DB. Open any row to jump into Notion.')}</p>
       </div>
-      <a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>
+      <div class="hero-actions">
+        ${syncUrl ? `<a href="${escapeAttr(syncUrl)}" target="_blank" rel="noopener" class="hero-btn secondary" title="Opens GitHub Actions — click 'Run workflow' there">🔄 Run sync now</a>` : ''}
+        <a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>
+      </div>
     `;
     wrap.appendChild(hero);
 
     if (notion && Array.isArray(notion.projects) && notion.projects.length > 0) {
-      // Sort: priority High > Medium > Low > unset, then by name
+      // Sort: lastEdited DESC (most recent first), then priority High>Medium>Low, then name
       const prioOrder = { 'high': 0, 'medium': 1, 'low': 2 };
+      const editedEpoch = p => {
+        if (!p.lastEdited) return 0;
+        const d = new Date(p.lastEdited);
+        return isNaN(d.getTime()) ? 0 : d.getTime();
+      };
       const sorted = [...notion.projects].sort((a, b) => {
+        const aE = editedEpoch(a), bE = editedEpoch(b);
+        if (aE !== bE) return bE - aE;  // most recent first
         const aP = prioOrder[(a.priority || '').toLowerCase()] ?? 99;
         const bP = prioOrder[(b.priority || '').toLowerCase()] ?? 99;
         if (aP !== bP) return aP - bP;
         return (a.name || '').localeCompare(b.name || '');
       });
+
+      // Build customer filter chips
+      const allCustomers = new Set();
+      sorted.forEach(p => projectCustomers(p).forEach(c => allCustomers.add(c)));
+      if (allCustomers.size > 0) {
+        const filterBar = document.createElement('div');
+        filterBar.className = 'filter-bar';
+        filterBar.id = 'customer-filter';
+        const saved = JSON.parse(localStorage.getItem('nexus.customerFilter') || '[]');
+        let activeFilters = new Set(saved.filter(c => allCustomers.has(c)));
+        const renderChips = () => {
+          filterBar.innerHTML = '<span class="filter-label">Customer:</span>';
+          [...allCustomers].sort().forEach(c => {
+            const chip = document.createElement('span');
+            chip.className = 'filter-chip' + (activeFilters.has(c) ? ' active' : '');
+            chip.textContent = c;
+            chip.addEventListener('click', () => {
+              activeFilters.has(c) ? activeFilters.delete(c) : activeFilters.add(c);
+              localStorage.setItem('nexus.customerFilter', JSON.stringify([...activeFilters]));
+              renderChips();
+              applyFilter();
+            });
+            filterBar.appendChild(chip);
+          });
+          if (activeFilters.size > 0) {
+            const clear = document.createElement('span');
+            clear.className = 'filter-chip clear';
+            clear.textContent = '✕ Clear';
+            clear.addEventListener('click', () => {
+              activeFilters.clear();
+              localStorage.removeItem('nexus.customerFilter');
+              renderChips();
+              applyFilter();
+            });
+            filterBar.appendChild(clear);
+          }
+        };
+        const applyFilter = () => {
+          const wanted = [...activeFilters].map(c => c.toLowerCase());
+          document.querySelectorAll('.proj-row').forEach(row => {
+            if (wanted.length === 0) {
+              row.classList.remove('hidden');
+              return;
+            }
+            const rowCustomers = (row.dataset.customers || '').split('||').filter(Boolean);
+            const match = rowCustomers.some(c => wanted.includes(c));
+            row.classList.toggle('hidden', !match);
+          });
+        };
+        renderChips();
+        wrap.appendChild(filterBar);
+        // Apply persisted filter once rows are added (after table append below)
+        setTimeout(applyFilter, 0);
+      }
 
       const table = document.createElement('div');
       table.className = 'proj-table';

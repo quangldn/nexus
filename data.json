@@ -88,8 +88,9 @@
       "icon": "📋",
       "type": "notion",
       "notionUrl": "https://www.notion.so/1fa9e3a81ab381229969faa4690dbfc7?v=1fa9e3a81ab38187a624000ca9e3fcc4",
+      "syncWorkflowUrl": "https://github.com/quangldn/nexus/actions/workflows/notion-sync.yml",
       "heroTitle": "Project Database",
-      "heroText": "All your active quotes, requests, and project records. Opens in Notion with your saved filters."
+      "heroText": "Auto-refreshed daily at 8AM (Vietnam). Click 'Run sync now' to refresh immediately, or 'Open in Notion' to edit."
     }
   ]
 }
