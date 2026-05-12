@@ -1,0 +1,95 @@
+{
+  "lastEdited": "2026-05-12",
+  "tabs": [
+    {
+      "id": "home",
+      "name": "Homepage",
+      "icon": "🏠",
+      "type": "boxes",
+      "links": [
+        {
+          "title": "ngCRM",
+          "subtitle": "Salesforce pipeline & cards",
+          "icon": "📊",
+          "url": "https://infinera.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Finfinera.lightning.force.com%252Flightning%252Fpage%252Fhome"
+        },
+        {
+          "title": "Seat Booking",
+          "subtitle": "Condeco office desk",
+          "icon": "🪑",
+          "url": "https://nokia.condecosoftware.com/master.aspx"
+        },
+        {
+          "title": "Nokia Me",
+          "subtitle": "HR portal",
+          "icon": "👤",
+          "url": "https://fa-evmr-saasfaprod1.fa.ocs.oraclecloud.com/fscmUI/faces/FuseWelcome?_afrLoop=1574663858130011&fnd=%3B%3B%3B%3Bfalse%3B256%3B%3B%3B&_adf.ctrl-state=fp3n8czon_117"
+        },
+        {
+          "title": "Xactly",
+          "subtitle": "Commission & comp",
+          "icon": "💵",
+          "url": "https://autheu.xactlycorp.com/sso/saml2"
+        },
+        {
+          "title": "NI-ON Sales Center",
+          "subtitle": "Optical sales portal",
+          "icon": "🌐",
+          "url": "https://nokia.sharepoint.com/sites/SalesCenter/SitePages/Optical-networks-equipment.aspx"
+        },
+        {
+          "title": "Nokia SharePoint",
+          "subtitle": "All SP sites",
+          "icon": "🗂️",
+          "url": "https://nokia.sharepoint.com/_layouts/15/sharepoint.aspx"
+        }
+      ]
+    },
+    {
+      "id": "products",
+      "name": "Products Wiki",
+      "icon": "📚",
+      "type": "list",
+      "groups": [
+        {
+          "name": "Roadmap Q2 2026",
+          "links": [
+            {
+              "title": "Optical Networks Portfolio Overview",
+              "note": "Roadmap update — Apr '26",
+              "icon": "🗺️",
+              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Optical%20Networks%20Portfolio%20Overview%20and%20Evolution%20Apr'26.pptx?d=w78b8ec0cb8ac4fda8cffd5db24054bbf"
+            },
+            {
+              "title": "1830 GX Roadmap",
+              "note": "GX Transcend v1.0",
+              "icon": "📡",
+              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20GX%20Transcend%20v1.0.pptx?d=w93c0d12d75e64c3db5e7bbd1212cbef3"
+            },
+            {
+              "title": "1830 PSS Roadmap",
+              "note": "PSS / PSI-M / PSD / WaveSuite v1.0",
+              "icon": "📡",
+              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20PSS%20PSI-M%20PSD%20WaveSuite%20v1.0.pptx?d=wfcda4dda0eb14f60a351706989b34938"
+            },
+            {
+              "title": "Pluggables Roadmap",
+              "note": "Pluggables & Components v1.0",
+              "icon": "🔌",
+              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20Pluggables%20%26%20Components%20v1.0.pptx?d=wc4b3ad7e44384dc0b27452d69d6c70e8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "name": "Projects",
+      "icon": "📋",
+      "type": "notion",
+      "notionUrl": "https://www.notion.so/1fa9e3a81ab381229969faa4690dbfc7?v=1fa9e3a81ab38187a624000ca9e3fcc4",
+      "heroTitle": "Project Database",
+      "heroText": "All your active quotes, requests, and project records. Opens in Notion with your saved filters."
+    }
+  ]
+}

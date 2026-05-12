@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Nokia · Nexus</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23124191'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='28' font-weight='800' fill='white'%3EN%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --navy: #124191;
+    --navy-dark: #0a2d6e;
+    --navy-soft: #e7ecf5;
+    --navy-tint: #f3f6fb;
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #f6f8fc;
+    --border: #e0e5ee;
+    --border-strong: #c9d1df;
+    --text: #1a1d24;
+    --muted: #5f6776;
+    --warn: #d97706;
+    --ok: #059669;
+    --danger: #dc2626;
+    --shadow: 0 1px 2px rgba(18,65,145,.04), 0 4px 12px rgba(18,65,145,.05);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+
+  /* ===== Header ===== */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-row {
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 32px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo-svg { height: 26px; display: block; }
+  .brand-divider {
+    width: 1px; height: 22px; background: var(--border-strong);
+  }
+  .app-name {
+    font-size: 18px; font-weight: 600; color: var(--navy-dark);
+    letter-spacing: -0.01em;
+  }
+  .app-tag {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid var(--border); padding: 2px 7px; border-radius: 10px;
+    margin-left: 2px;
+  }
+  #search {
+    flex: 1; min-width: 220px; max-width: 360px;
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13.5px; outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  #search:focus { border-color: var(--navy); background: #fff; }
+  .meta { color: var(--muted); font-size: 12px; margin-left: auto; }
+
+  /* ===== Tabs ===== */
+  nav.tabs {
+    display: flex; gap: 4px;
+    padding: 0 32px; border-bottom: 1px solid var(--border);
+    background: #fff;
+  }
+  .tab {
+    background: transparent; border: none;
+    padding: 12px 16px 14px; margin-bottom: -1px;
+    cursor: pointer; font: inherit; font-weight: 500;
+    color: var(--muted); border-bottom: 2px solid transparent;
+    display: flex; align-items: center; gap: 8px;
+    transition: color .15s, border-color .15s;
+  }
+  .tab:hover { color: var(--navy); }
+  .tab.active {
+    color: var(--navy); border-bottom-color: var(--navy);
+  }
+  .tab .tab-icon { font-size: 16px; }
+
+  /* ===== Panels ===== */
+  main { padding: 28px 32px 60px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ===== Homepage boxes ===== */
+  .box-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .box {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 18px 18px;
+    display: flex; flex-direction: column; gap: 8px;
+    text-decoration: none; color: var(--text);
+    transition: transform .12s, border-color .12s, box-shadow .12s;
+    min-height: 130px;
+    position: relative; overflow: hidden;
+  }
+  .box::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--navy); opacity: 0; transition: opacity .15s;
+  }
+  .box:hover {
+    transform: translateY(-2px);
+    border-color: var(--navy);
+    box-shadow: var(--shadow);
+  }
+  .box:hover::after { opacity: 1; }
+  .box .box-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--navy-soft); color: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .box .box-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .box .box-sub { font-size: 12px; color: var(--muted); margin-top: auto; }
+
+  /* ===== Products Wiki list ===== */
+  .list-section { margin-bottom: 28px; }
+  .list-section h3 {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .list-items {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; text-decoration: none; color: var(--text);
+    border-bottom: 1px solid var(--border);
+    transition: background .12s;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: var(--navy-tint); }
+  .list-item .li-icon {
+    color: var(--navy); font-size: 16px;
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--navy-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .list-item .li-title { flex: 1; font-weight: 500; }
+  .list-item .li-arrow { color: var(--muted); font-size: 14px; }
+
+  /* ===== Projects (Notion) ===== */
+  .notion-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    color: white; border-radius: 14px;
+    padding: 28px 28px 24px;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .notion-hero h2 {
+    margin: 0 0 4px; font-size: 20px; font-weight: 600;
+  }
+  .notion-hero p { margin: 0; opacity: 0.85; font-size: 13.5px; }
+  .notion-hero .hero-icon {
+    width: 56px; height: 56px; border-radius: 12px;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  .notion-hero .hero-text { flex: 1; min-width: 220px; }
+  .notion-hero .hero-btn {
+    background: white; color: var(--navy-dark);
+    padding: 10px 18px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: 13.5px;
+    transition: transform .12s;
+  }
+  .notion-hero .hero-btn:hover { transform: translateY(-1px); }
+  .proj-table {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .proj-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center; gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .proj-row:last-child { border-bottom: none; }
+  .proj-row:hover { background: var(--navy-tint); }
+  .proj-row .pname { font-weight: 500; }
+  .proj-row .updated { font-size: 11.5px; color: var(--muted); }
+  .proj-row .links a {
+    color: var(--navy); font-size: 12.5px;
+    text-decoration: none; margin-left: 8px;
+  }
+  .proj-row .links a:hover { text-decoration: underline; }
+  .pill {
+    font-size: 11px; padding: 3px 8px; border-radius: 10px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--muted); white-space: nowrap;
+  }
+  .pill.status-won { color: var(--ok); border-color: rgba(5,150,105,.3); background: rgba(5,150,105,.08); }
+  .pill.status-active { color: var(--navy); border-color: rgba(18,65,145,.3); background: var(--navy-soft); }
+  .pill.status-lost { color: var(--danger); border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.06); }
+  .pill.status-pending { color: var(--warn); border-color: rgba(217,119,6,.3); background: rgba(217,119,6,.08); }
+
+  /* ===== Misc ===== */
+  .empty {
+    background: var(--panel); border: 1px dashed var(--border-strong);
+    border-radius: 12px; padding: 22px;
+    text-align: center; color: var(--muted); font-size: 13px;
+  }
+  .empty kbd {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 6px; font-size: 12px;
+  }
+  .error-banner {
+    margin: 18px 32px; padding: 12px 16px;
+    background: rgba(220,38,38,.06); border: 1px solid rgba(220,38,38,.3);
+    border-radius: 8px; color: var(--danger); font-size: 13px;
+  }
+  footer {
+    padding: 0 32px 28px; color: var(--muted); font-size: 11.5px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .hidden { display: none !important; }
+  #toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy-dark); color: white;
+    padding: 10px 16px; border-radius: 10px; font-size: 13px;
+    box-shadow: 0 8px 24px rgba(10,45,110,.25);
+    opacity: 0; transition: opacity .2s, transform .2s;
+    pointer-events: none; z-index: 100;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 640px) {
+    .header-row, nav.tabs, main, footer { padding-left: 16px; padding-right: 16px; }
+    .proj-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="brand">
+      <svg class="logo-svg" viewBox="0 0 130 28" xmlns="http://www.w3.org/2000/svg" aria-label="Nokia">
+        <text x="0" y="22" font-family="-apple-system, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" fill="#124191" letter-spacing="1.5">NOKIA</text>
+      </svg>
+      <span class="brand-divider"></span>
+      <span class="app-name">Nexus</span>
+      <span class="app-tag">personal desk</span>
+    </div>
+    <input id="search" type="search" placeholder="Search this tab…  (Ctrl+K)" autocomplete="off" />
+    <span class="meta" id="meta"></span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <!-- tabs injected by JS -->
+  </nav>
+</header>
+
+<div id="errors"></div>
+
+<main id="main">
+  <!-- panels injected by JS -->
+</main>
+
+<footer>
+  <span>Edits land in GitHub. Refresh the page after a push to pull the latest <kbd>data.json</kbd>.</span>
+  <span id="last-edited"></span>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+(async function () {
+  const tabsEl = document.getElementById('tabs');
+  const mainEl = document.getElementById('main');
+  const metaEl = document.getElementById('meta');
+  const lastEd = document.getElementById('last-edited');
+  const errors = document.getElementById('errors');
+  const toast = document.getElementById('toast');
+
+  function showError(msg) {
+    const div = document.createElement('div');
+    div.className = 'error-banner';
+    div.textContent = msg;
+    errors.appendChild(div);
+  }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function escapeAttr(s) { return escapeHtml(s); }
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+  async function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard) await navigator.clipboard.writeText(text);
+      else {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove();
+      }
+      showToast('Path copied — paste in File Explorer');
+    } catch (e) { showToast('Copy failed: ' + (e.message || e)); }
+  }
+  async function loadJson(path) {
+    try {
+      const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      showError('Could not load ' + path + ' — ' + (e.message || e));
+      return null;
+    }
+  }
+
+  const [data, notion] = await Promise.all([
+    loadJson('data.json'),
+    loadJson('notion-projects.json')
+  ]);
+  if (!data) { showError('Cannot continue without data.json.'); return; }
+
+  // ---- Build tabs ----
+  const tabs = data.tabs || [];
+  tabs.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i === 0 ? ' active' : '');
+    btn.dataset.tab = t.id;
+    btn.innerHTML = `<span class="tab-icon">${escapeHtml(t.icon || '')}</span>${escapeHtml(t.name)}`;
+    tabsEl.appendChild(btn);
+
+    const panel = document.createElement('section');
+    panel.className = 'panel' + (i === 0 ? ' active' : '');
+    panel.id = 'panel-' + t.id;
+    panel.appendChild(renderTab(t));
+    mainEl.appendChild(panel);
+  });
+
+  // restore last-active tab
+  const saved = localStorage.getItem('nexus.activeTab');
+  if (saved && document.querySelector(`.tab[data-tab="${saved}"]`)) {
+    activateTab(saved);
+  }
+
+  function activateTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+    localStorage.setItem('nexus.activeTab', id);
+    document.getElementById('search').value = '';
+    document.getElementById('search').dispatchEvent(new Event('input'));
+  }
+
+  tabsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if (btn) activateTab(btn.dataset.tab);
+  });
+
+  // ---- Renderers per tab type ----
+  function renderTab(t) {
+    const frag = document.createDocumentFragment();
+    if (t.type === 'boxes') frag.appendChild(renderBoxes(t.links || []));
+    else if (t.type === 'list') frag.appendChild(renderList(t.groups || [{ name: '', links: t.links || [] }]));
+    else if (t.type === 'notion') frag.appendChild(renderNotion(t));
+    else frag.appendChild(renderList([{ name: '', links: t.links || [] }]));
+    return frag;
+  }
+
+  function renderBoxes(links) {
+    const wrap = document.createElement('div');
+    wrap.className = 'box-grid';
+    links.forEach(l => {
+      const search = ((l.title || '') + ' ' + (l.subtitle || '') + ' ' + (l.url || '')).toLowerCase();
+      const el = document.createElement(l.local ? 'button' : 'a');
+      el.className = 'box';
+      el.dataset.search = search;
+      if (l.local) { el.dataset.path = l.path || ''; el.type = 'button'; }
+      else { el.href = l.url; el.target = '_blank'; el.rel = 'noopener'; }
+      el.innerHTML = `
+        <div class="box-icon">${escapeHtml(l.icon || '🔗')}</div>
+        <div class="box-title">${escapeHtml(l.title)}</div>
+        <div class="box-sub">${escapeHtml(l.subtitle || (l.local ? l.path : new URL(l.url).hostname.replace(/^www\./, '')))}</div>
+      `;
+      wrap.appendChild(el);
+    });
+    return wrap;
+  }
+
+  function renderList(groups) {
+    const wrap = document.createElement('div');
+    groups.forEach(g => {
+      const section = document.createElement('div');
+      section.className = 'list-section';
+      if (g.name) section.innerHTML = `<h3>${escapeHtml(g.name)}</h3>`;
+      const items = document.createElement('div');
+      items.className = 'list-items';
+      (g.links || []).forEach(l => {
+        const search = ((l.title || '') + ' ' + (l.note || '') + ' ' + (l.url || '')).toLowerCase();
+        const el = document.createElement(l.local ? 'button' : 'a');
+        el.className = 'list-item';
+        el.dataset.search = search;
+        if (l.local) { el.dataset.path = l.path || ''; el.type = 'button'; }
+        else { el.href = l.url; el.target = '_blank'; el.rel = 'noopener'; }
+        el.innerHTML = `
+          <div class="li-icon">${escapeHtml(l.icon || '📄')}</div>
+          <div class="li-title">${escapeHtml(l.title)}${l.note ? ` <span style="color:var(--muted);font-weight:400;font-size:12px">— ${escapeHtml(l.note)}</span>` : ''}</div>
+          <div class="li-arrow">→</div>
+        `;
+        items.appendChild(el);
+      });
+      section.appendChild(items);
+      wrap.appendChild(section);
+    });
+    return wrap;
+  }
+
+  function renderNotion(t) {
+    const wrap = document.createElement('div');
+    const hero = document.createElement('div');
+    hero.className = 'notion-hero';
+    hero.innerHTML = `
+      <div class="hero-icon">📋</div>
+      <div class="hero-text">
+        <h2>${escapeHtml(t.heroTitle || 'Project Database')}</h2>
+        <p>${escapeHtml(t.heroText || 'Filter, group, edit — opens your Notion view in a new tab.')}</p>
+      </div>
+      <a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>
+    `;
+    wrap.appendChild(hero);
+
+    if (notion && Array.isArray(notion.projects) && notion.projects.length > 0) {
+      const table = document.createElement('div');
+      table.className = 'proj-table';
+      notion.projects.forEach(p => {
+        const status = (p.status || '').toLowerCase();
+        const statusCls = 'pill status-' + (
+          status.includes('won') ? 'won' :
+          status.includes('lost') ? 'lost' :
+          status.includes('pend') || status.includes('wait') ? 'pending' :
+          status ? 'active' : 'active'
+        );
+        const search = ((p.name || '') + ' ' + (p.status || '') + ' ' + (p.customer || '')).toLowerCase();
+        const linksHtml = (p.links || []).map(lnk =>
+          `<a href="${escapeAttr(lnk.url)}" target="_blank" rel="noopener">${escapeHtml(lnk.label || 'open')}</a>`).join('');
+        const row = document.createElement('div');
+        row.className = 'proj-row';
+        row.dataset.search = search;
+        row.innerHTML = `
+          <span class="pname">${escapeHtml(p.name)}</span>
+          ${p.status ? `<span class="${statusCls}">${escapeHtml(p.status)}</span>` : '<span></span>'}
+          <span class="links">${linksHtml}</span>
+          <span class="updated">${escapeHtml(p.updated || '')}</span>
+        `;
+        table.appendChild(row);
+      });
+      wrap.appendChild(table);
+      if (notion.lastSync) {
+        const sync = document.createElement('div');
+        sync.style.cssText = 'margin-top:10px;font-size:11.5px;color:var(--muted)';
+        sync.textContent = 'Last Notion sync: ' + notion.lastSync;
+        wrap.appendChild(sync);
+      }
+    } else {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.innerHTML = `No project snapshot yet.<br><br>Ask Claude on your personal laptop: <kbd>refresh Notion</kbd> — it will pull your DB and push an updated <kbd>notion-projects.json</kbd> to the repo.`;
+      wrap.appendChild(empty);
+    }
+    return wrap;
+  }
+
+  // ---- Search across visible panel ----
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.trim().toLowerCase();
+    const activePanel = document.querySelector('.panel.active');
+    if (!activePanel) return;
+    activePanel.querySelectorAll('[data-search]').forEach(el => {
+      const hit = !q || el.dataset.search.includes(q);
+      el.classList.toggle('hidden', !hit);
+    });
+  });
+
+  // ---- Local path copy ----
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-path]');
+    if (btn && btn.dataset.path) { e.preventDefault(); copyToClipboard(btn.dataset.path); }
+  });
+
+  // ---- Shortcuts ----
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); search.focus(); search.select();
+    }
+    if (e.key === 'Escape' && document.activeElement === search) {
+      search.value = ''; search.dispatchEvent(new Event('input')); search.blur();
+    }
+    // Number keys 1-9 switch tab when not typing
+    if (document.activeElement !== search && /^[1-9]$/.test(e.key)) {
+      const idx = parseInt(e.key, 10) - 1;
+      const btn = document.querySelectorAll('.tab')[idx];
+      if (btn) activateTab(btn.dataset.tab);
+    }
+  });
+
+  // ---- Meta ----
+  const totalLinks = tabs.reduce((sum, t) => {
+    if (t.links) return sum + t.links.length;
+    if (t.groups) return sum + t.groups.reduce((s, g) => s + (g.links || []).length, 0);
+    return sum;
+  }, 0);
+  metaEl.textContent = totalLinks + ' links · ' + tabs.length + ' tabs';
+  if (data.lastEdited) lastEd.textContent = 'Links updated: ' + data.lastEdited + (notion && notion.lastSync ? ' · Notion: ' + notion.lastSync : '');
+})();
+</script>
+</body>
+</html>
