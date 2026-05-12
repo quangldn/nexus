@@ -178,35 +178,66 @@
     transition: transform .12s;
   }
   .notion-hero .hero-btn:hover { transform: translateY(-1px); }
+  .proj-group { margin-bottom: 22px; }
+  .proj-group h3 {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .proj-group h3 .grp-count {
+    font-size: 11px; padding: 1px 7px; border-radius: 8px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--muted); letter-spacing: 0;
+  }
   .proj-table {
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 12px; overflow: hidden;
   }
   .proj-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    align-items: center; gap: 14px;
+    display: block;
     padding: 12px 16px;
     border-bottom: 1px solid var(--border);
+    text-decoration: none; color: var(--text);
+    transition: background .12s;
   }
   .proj-row:last-child { border-bottom: none; }
   .proj-row:hover { background: var(--navy-tint); }
-  .proj-row .pname { font-weight: 500; }
-  .proj-row .updated { font-size: 11.5px; color: var(--muted); }
-  .proj-row .links a {
-    color: var(--navy); font-size: 12.5px;
-    text-decoration: none; margin-left: 8px;
+  .proj-row .row-top {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   }
-  .proj-row .links a:hover { text-decoration: underline; }
+  .proj-row .pname {
+    font-weight: 600; font-size: 14px; flex: 1; min-width: 180px;
+  }
+  .proj-row .row-meta {
+    margin-top: 4px; font-size: 12px; color: var(--muted);
+  }
+  .proj-row .row-meta .dot { margin: 0 6px; opacity: 0.5; }
+  .proj-row .row-update {
+    margin-top: 6px; font-size: 12.5px;
+    color: var(--text); opacity: 0.78;
+    padding: 6px 10px; background: var(--panel-2);
+    border-radius: 6px; border-left: 2px solid var(--navy-soft);
+    line-height: 1.4;
+  }
+  .proj-row .row-arrow {
+    color: var(--muted); font-size: 14px; flex-shrink: 0;
+  }
   .pill {
     font-size: 11px; padding: 3px 8px; border-radius: 10px;
     background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--muted); white-space: nowrap;
+    color: var(--muted); white-space: nowrap; font-weight: 500;
   }
   .pill.status-won { color: var(--ok); border-color: rgba(5,150,105,.3); background: rgba(5,150,105,.08); }
   .pill.status-active { color: var(--navy); border-color: rgba(18,65,145,.3); background: var(--navy-soft); }
+  .pill.status-deploy { color: #047857; border-color: rgba(4,120,87,.3); background: rgba(4,120,87,.08); }
   .pill.status-lost { color: var(--danger); border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.06); }
   .pill.status-pending { color: var(--warn); border-color: rgba(217,119,6,.3); background: rgba(217,119,6,.08); }
+  .pill.status-paused { color: #6b7280; border-color: #d1d5db; background: #f3f4f6; }
+  .pill.cat-nokia { color: var(--navy-dark); border-color: var(--navy); background: var(--navy-soft); font-weight: 600; }
+  .pill.cat-personal { color: #7c2d92; border-color: rgba(124,45,146,.3); background: rgba(124,45,146,.08); }
+  .pill.prio-high { color: var(--danger); border-color: rgba(220,38,38,.4); background: rgba(220,38,38,.08); }
+  .pill.prio-medium { color: var(--warn); border-color: rgba(217,119,6,.3); background: rgba(217,119,6,.08); }
+  .pill.prio-low { color: var(--muted); }
 
   /* ===== Misc ===== */
   .empty {
@@ -422,50 +453,118 @@
     return wrap;
   }
 
+  function statusClass(status) {
+    const s = (status || '').toLowerCase();
+    if (s.includes('lost') || s.includes('cancel')) return 'status-lost';
+    if (s.includes('complet') || s.includes('won') || s.includes('awarded')) return 'status-won';
+    if (s.includes('deploy')) return 'status-deploy';
+    if (s.includes('postpon') || s.includes('paus')) return 'status-paused';
+    if (s.includes('plan') || s.includes('backlog') || s.includes('pend') || s.includes('wait')) return 'status-pending';
+    return 'status-active';
+  }
+  function prioClass(p) {
+    const x = (p || '').toLowerCase();
+    if (x === 'high') return 'prio-high';
+    if (x === 'medium') return 'prio-medium';
+    if (x === 'low') return 'prio-low';
+    return '';
+  }
+
+  function renderProjectRow(p) {
+    const search = [p.name, p.status, p.customer, p.lineSystem, p.category, p.priority, p.keyUpdate, p.description]
+      .filter(Boolean).join(' ').toLowerCase();
+    const a = document.createElement('a');
+    a.className = 'proj-row';
+    a.href = p.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.dataset.search = search;
+
+    const pills = [];
+    if (p.category) pills.push(`<span class="pill cat-${p.category.toLowerCase()}">${escapeHtml(p.category)}</span>`);
+    if (p.priority) pills.push(`<span class="pill ${prioClass(p.priority)}">${escapeHtml(p.priority)}</span>`);
+    if (p.status) pills.push(`<span class="pill ${statusClass(p.status)}">${escapeHtml(p.status)}</span>`);
+
+    const metaParts = [];
+    if (p.customer) metaParts.push('👥 ' + escapeHtml(p.customer));
+    if (p.lineSystem) metaParts.push('📡 ' + escapeHtml(p.lineSystem));
+    if (p.bom) metaParts.push('📦 BoM: ' + escapeHtml(p.bom));
+    if (p.projectType) metaParts.push(escapeHtml(p.projectType));
+    const metaHtml = metaParts.length ? `<div class="row-meta">${metaParts.join('<span class="dot">·</span>')}</div>` : '';
+
+    const updateText = p.keyUpdate || p.description || '';
+    const updateHtml = updateText
+      ? `<div class="row-update">${escapeHtml(updateText)}</div>`
+      : '';
+
+    a.innerHTML = `
+      <div class="row-top">
+        <span class="pname">${escapeHtml(p.name)}</span>
+        ${pills.join('')}
+        <span class="row-arrow">→</span>
+      </div>
+      ${metaHtml}
+      ${updateHtml}
+    `;
+    return a;
+  }
+
   function renderNotion(t) {
     const wrap = document.createElement('div');
     const hero = document.createElement('div');
     hero.className = 'notion-hero';
+    const heroCount = notion && Array.isArray(notion.projects) ? notion.projects.length : 0;
     hero.innerHTML = `
       <div class="hero-icon">📋</div>
       <div class="hero-text">
-        <h2>${escapeHtml(t.heroTitle || 'Project Database')}</h2>
-        <p>${escapeHtml(t.heroText || 'Filter, group, edit — opens your Notion view in a new tab.')}</p>
+        <h2>${escapeHtml(t.heroTitle || 'Project Database')}${heroCount ? ` <span style="opacity:.7;font-weight:400;font-size:15px">· ${heroCount} active</span>` : ''}</h2>
+        <p>${escapeHtml(t.heroText || 'Snapshot of your Notion DB. Open any row to jump into Notion.')}</p>
       </div>
       <a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>
     `;
     wrap.appendChild(hero);
 
     if (notion && Array.isArray(notion.projects) && notion.projects.length > 0) {
-      const table = document.createElement('div');
-      table.className = 'proj-table';
-      notion.projects.forEach(p => {
-        const status = (p.status || '').toLowerCase();
-        const statusCls = 'pill status-' + (
-          status.includes('won') ? 'won' :
-          status.includes('lost') ? 'lost' :
-          status.includes('pend') || status.includes('wait') ? 'pending' :
-          status ? 'active' : 'active'
-        );
-        const search = ((p.name || '') + ' ' + (p.status || '') + ' ' + (p.customer || '')).toLowerCase();
-        const linksHtml = (p.links || []).map(lnk =>
-          `<a href="${escapeAttr(lnk.url)}" target="_blank" rel="noopener">${escapeHtml(lnk.label || 'open')}</a>`).join('');
-        const row = document.createElement('div');
-        row.className = 'proj-row';
-        row.dataset.search = search;
-        row.innerHTML = `
-          <span class="pname">${escapeHtml(p.name)}</span>
-          ${p.status ? `<span class="${statusCls}">${escapeHtml(p.status)}</span>` : '<span></span>'}
-          <span class="links">${linksHtml}</span>
-          <span class="updated">${escapeHtml(p.updated || '')}</span>
-        `;
-        table.appendChild(row);
+      // Sort: NOKIA first, then by priority High>Medium>Low>none, then by name
+      const prioOrder = { 'high': 0, 'medium': 1, 'low': 2 };
+      const sorted = [...notion.projects].sort((a, b) => {
+        const aCat = (a.category || 'zzz').toLowerCase();
+        const bCat = (b.category || 'zzz').toLowerCase();
+        if (aCat !== bCat) {
+          if (aCat === 'nokia') return -1;
+          if (bCat === 'nokia') return 1;
+          return aCat.localeCompare(bCat);
+        }
+        const aP = prioOrder[(a.priority || '').toLowerCase()] ?? 99;
+        const bP = prioOrder[(b.priority || '').toLowerCase()] ?? 99;
+        if (aP !== bP) return aP - bP;
+        return (a.name || '').localeCompare(b.name || '');
       });
-      wrap.appendChild(table);
+
+      // Group by category
+      const groups = {};
+      sorted.forEach(p => {
+        const cat = p.category || 'Other';
+        (groups[cat] = groups[cat] || []).push(p);
+      });
+      const order = ['NOKIA', 'PERSONAL', 'Other'];
+      order.forEach(catName => {
+        const items = groups[catName];
+        if (!items || !items.length) return;
+        const group = document.createElement('div');
+        group.className = 'proj-group';
+        group.innerHTML = `<h3>${escapeHtml(catName)} <span class="grp-count">${items.length}</span></h3>`;
+        const table = document.createElement('div');
+        table.className = 'proj-table';
+        items.forEach(p => table.appendChild(renderProjectRow(p)));
+        group.appendChild(table);
+        wrap.appendChild(group);
+      });
+
       if (notion.lastSync) {
         const sync = document.createElement('div');
-        sync.style.cssText = 'margin-top:10px;font-size:11.5px;color:var(--muted)';
-        sync.textContent = 'Last Notion sync: ' + notion.lastSync;
+        sync.style.cssText = 'margin-top:6px;font-size:11.5px;color:var(--muted)';
+        sync.textContent = 'Last Notion sync: ' + notion.lastSync + (notion.source ? ' · ' + notion.source : '');
         wrap.appendChild(sync);
       }
     } else {
