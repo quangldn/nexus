@@ -238,6 +238,24 @@
   .pill.prio-high { color: var(--danger); border-color: rgba(220,38,38,.4); background: rgba(220,38,38,.08); }
   .pill.prio-medium { color: var(--warn); border-color: rgba(217,119,6,.3); background: rgba(217,119,6,.08); }
   .pill.prio-low { color: var(--muted); }
+  .bom-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 5px 10px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--navy-soft), #eaf0fa);
+    border: 1px solid var(--navy);
+    color: var(--navy-dark); font-size: 12px; font-weight: 500;
+    cursor: pointer; user-select: none;
+    transition: background .12s, transform .08s;
+    max-width: 100%;
+  }
+  .bom-chip:hover { background: #dde6f5; }
+  .bom-chip:active { transform: scale(0.98); }
+  .bom-chip .bom-label { font-weight: 600; }
+  .bom-chip .bom-file {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 360px; opacity: 0.85;
+  }
 
   /* ===== Misc ===== */
   .empty {
@@ -497,6 +515,15 @@
       ? `<div class="row-update">${escapeHtml(updateText)}</div>`
       : '';
 
+    let bomHtml = '';
+    if (p.latestBom) {
+      const filename = p.latestBom.split(/[\\\/]/).pop();
+      bomHtml = `<div><span class="bom-chip" role="button" tabindex="0" data-path="${escapeAttr(p.latestBom)}" title="Click to copy full path:&#10;${escapeAttr(p.latestBom)}">
+        <span class="bom-label">📦 Latest BOM</span>
+        <span class="bom-file">${escapeHtml(filename)}</span>
+      </span></div>`;
+    }
+
     a.innerHTML = `
       <div class="row-top">
         <span class="pname">${escapeHtml(p.name)}</span>
@@ -505,6 +532,7 @@
       </div>
       ${metaHtml}
       ${updateHtml}
+      ${bomHtml}
     `;
     return a;
   }
@@ -591,8 +619,12 @@
   // ---- Local path copy ----
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-path]');
-    if (btn && btn.dataset.path) { e.preventDefault(); copyToClipboard(btn.dataset.path); }
-  });
+    if (btn && btn.dataset.path) {
+      e.preventDefault();
+      e.stopPropagation();
+      copyToClipboard(btn.dataset.path);
+    }
+  }, true);
 
   // ---- Shortcuts ----
   document.addEventListener('keydown', e => {
