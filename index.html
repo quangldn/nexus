@@ -499,7 +499,6 @@
     a.dataset.search = search;
 
     const pills = [];
-    if (p.category) pills.push(`<span class="pill cat-${p.category.toLowerCase()}">${escapeHtml(p.category)}</span>`);
     if (p.priority) pills.push(`<span class="pill ${prioClass(p.priority)}">${escapeHtml(p.priority)}</span>`);
     if (p.status) pills.push(`<span class="pill ${statusClass(p.status)}">${escapeHtml(p.status)}</span>`);
 
@@ -553,45 +552,23 @@
     wrap.appendChild(hero);
 
     if (notion && Array.isArray(notion.projects) && notion.projects.length > 0) {
-      // Sort: NOKIA first, then by priority High>Medium>Low>none, then by name
+      // Sort: priority High > Medium > Low > unset, then by name
       const prioOrder = { 'high': 0, 'medium': 1, 'low': 2 };
       const sorted = [...notion.projects].sort((a, b) => {
-        const aCat = (a.category || 'zzz').toLowerCase();
-        const bCat = (b.category || 'zzz').toLowerCase();
-        if (aCat !== bCat) {
-          if (aCat === 'nokia') return -1;
-          if (bCat === 'nokia') return 1;
-          return aCat.localeCompare(bCat);
-        }
         const aP = prioOrder[(a.priority || '').toLowerCase()] ?? 99;
         const bP = prioOrder[(b.priority || '').toLowerCase()] ?? 99;
         if (aP !== bP) return aP - bP;
         return (a.name || '').localeCompare(b.name || '');
       });
 
-      // Group by category
-      const groups = {};
-      sorted.forEach(p => {
-        const cat = p.category || 'Other';
-        (groups[cat] = groups[cat] || []).push(p);
-      });
-      const order = ['NOKIA', 'PERSONAL', 'Other'];
-      order.forEach(catName => {
-        const items = groups[catName];
-        if (!items || !items.length) return;
-        const group = document.createElement('div');
-        group.className = 'proj-group';
-        group.innerHTML = `<h3>${escapeHtml(catName)} <span class="grp-count">${items.length}</span></h3>`;
-        const table = document.createElement('div');
-        table.className = 'proj-table';
-        items.forEach(p => table.appendChild(renderProjectRow(p)));
-        group.appendChild(table);
-        wrap.appendChild(group);
-      });
+      const table = document.createElement('div');
+      table.className = 'proj-table';
+      sorted.forEach(p => table.appendChild(renderProjectRow(p)));
+      wrap.appendChild(table);
 
       if (notion.lastSync) {
         const sync = document.createElement('div');
-        sync.style.cssText = 'margin-top:6px;font-size:11.5px;color:var(--muted)';
+        sync.style.cssText = 'margin-top:8px;font-size:11.5px;color:var(--muted)';
         sync.textContent = 'Last Notion sync: ' + notion.lastSync + (notion.source ? ' · ' + notion.source : '');
         wrap.appendChild(sync);
       }

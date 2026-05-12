@@ -1,14 +1,12 @@
 {
   "lastSync": "2026-05-12",
-  "source": "Notion — MY PROJECTS · Active view",
-  "viewUrl": "https://www.notion.so/1fa9e3a81ab381229969faa4690dbfc7?v=1fa9e3a81ab38187a624000ca9e3fcc4",
-  "count": 21,
+  "source": "Notion — MY PROJECTS · NOKIA active (auto-synced)",
+  "count": 17,
   "projects": [
     {
       "name": "FTEL - Backbone 4",
       "status": "Business Development",
       "priority": "High",
-      "category": "NOKIA",
       "lineSystem": "1830-PSS",
       "bom": "Budgetary",
       "projectType": "Green Field",
@@ -19,7 +17,6 @@
       "name": "VSTN Phase 2",
       "status": "Business Development",
       "priority": "High",
-      "category": "NOKIA",
       "lineSystem": "GX",
       "bom": "BoM Review",
       "projectType": "Brown Field",
@@ -28,52 +25,15 @@
       "url": "https://www.notion.so/2df9e3a81ab38084b957c9972664d64a"
     },
     {
-      "name": "UBND TP HCM Metro Network",
-      "status": "Business Development",
-      "priority": "Medium",
-      "category": "NOKIA",
-      "lineSystem": "IP Network",
-      "bom": "Budgetary",
-      "projectType": "Green Field",
-      "url": "https://www.notion.so/2e79e3a81ab3801e87edd4cd40341166"
-    },
-    {
       "name": "FTEL XR Development",
       "status": "Business Development",
       "priority": "Medium",
       "customer": "FPT Telecom",
-      "category": "NOKIA",
       "lineSystem": "XTM",
       "bom": "BoM Review",
       "projectType": "Green Field",
       "description": "Engage with INF MB for the XR applications in the Metro - Aggregation network segment",
       "url": "https://www.notion.so/1fa9e3a81ab381278c91e21a5927d6d7"
-    },
-    {
-      "name": "MOPS Unified Network Infrastructure",
-      "status": "Business Development",
-      "priority": "Medium",
-      "customer": "MoPS, FPT Telecom, Mobifone",
-      "category": "NOKIA",
-      "projectType": "Consultant",
-      "url": "https://www.notion.so/23e9e3a81ab380ac978ccc43c70a2f5d"
-    },
-    {
-      "name": "Mobifone BD",
-      "status": "Business Development",
-      "priority": "Medium",
-      "customer": "Mobifone",
-      "category": "NOKIA",
-      "lineSystem": "1830-PSS",
-      "bom": "Budgetary",
-      "projectType": "Green Field",
-      "url": "https://www.notion.so/3529e3a81ab380899ebbc8d92d43e23f"
-    },
-    {
-      "name": "VNPT Central Backhaul",
-      "status": "Business Development",
-      "priority": "Medium",
-      "url": "https://www.notion.so/3499e3a81ab3808e96e8d97d7ac465cd"
     },
     {
       "name": "HCMC Railway Metro",
@@ -82,11 +42,49 @@
       "url": "https://www.notion.so/32f9e3a81ab3805ca093cb3e579dfe36"
     },
     {
+      "name": "Mobifone BD",
+      "status": "Business Development",
+      "priority": "Medium",
+      "customer": "Mobifone",
+      "lineSystem": "1830-PSS",
+      "bom": "Budgetary",
+      "projectType": "Green Field",
+      "url": "https://www.notion.so/3529e3a81ab380899ebbc8d92d43e23f"
+    },
+    {
+      "name": "MOPS Unified Network Infrastructure",
+      "status": "Business Development",
+      "priority": "Medium",
+      "customer": "MoPS, FPT Telecom, Mobifone",
+      "projectType": "Consultant",
+      "url": "https://www.notion.so/23e9e3a81ab380ac978ccc43c70a2f5d"
+    },
+    {
+      "name": "UBND TP HCM Metro Network",
+      "status": "Business Development",
+      "priority": "Medium",
+      "lineSystem": "IP Network",
+      "bom": "Budgetary",
+      "projectType": "Green Field",
+      "url": "https://www.notion.so/2e79e3a81ab3801e87edd4cd40341166"
+    },
+    {
+      "name": "VNPT Central Backhaul",
+      "status": "Business Development",
+      "priority": "Medium",
+      "url": "https://www.notion.so/3499e3a81ab3808e96e8d97d7ac465cd"
+    },
+    {
+      "name": "APEC Cross Border",
+      "status": "Business Development",
+      "priority": "Low",
+      "url": "https://www.notion.so/2f79e3a81ab380848924d21f9fe96df6"
+    },
+    {
       "name": "DCI - Tổng cục thuế",
       "status": "Business Development",
       "priority": "Low",
       "customer": "MOF",
-      "category": "NOKIA",
       "lineSystem": "1830-PSS",
       "bom": "Budgetary",
       "projectType": "Green Field",
@@ -94,18 +92,29 @@
       "url": "https://www.notion.so/2f39e3a81ab38046b5eac82b9814d403"
     },
     {
-      "name": "FTEL GPON Engagement",
+      "name": "DCI BIDV Exp 2026",
       "status": "Business Development",
       "priority": "Low",
-      "customer": "FPT Telecom",
-      "category": "NOKIA",
-      "url": "https://www.notion.so/2429e3a81ab38002a653fc9756e6cce7"
+      "url": "https://www.notion.so/2f69e3a81ab38076b271d409a5b00339"
     },
     {
       "name": "FTEL DCI Q7 Q9",
       "status": "Business Development",
       "priority": "Low",
       "url": "https://www.notion.so/2cc9e3a81ab3802e9cf1db0ccc84d510"
+    },
+    {
+      "name": "FTEL GPON Engagement",
+      "status": "Business Development",
+      "priority": "Low",
+      "customer": "FPT Telecom",
+      "url": "https://www.notion.so/2429e3a81ab38002a653fc9756e6cce7"
+    },
+    {
+      "name": "NOKIA GENERAL",
+      "status": "In Progress",
+      "priority": "Low",
+      "url": "https://www.notion.so/1fa9e3a81ab38108ae27de9f3871970a"
     },
     {
       "name": "Review Hồ sơ H04",
@@ -115,63 +124,15 @@
       "url": "https://www.notion.so/2b29e3a81ab380b1b777e95ed491b954"
     },
     {
-      "name": "FTEL BD",
-      "status": "Business Development",
-      "category": "NOKIA",
-      "url": "https://www.notion.so/3569e3a81ab380ef8134d491a77a8e4a"
-    },
-    {
       "name": "Vietnam Mobile BD",
       "status": "Business Development",
       "priority": "Low",
       "url": "https://www.notion.so/32f9e3a81ab380bf8af4e6909b8e337e"
     },
     {
-      "name": "APEC Cross Border",
+      "name": "FTEL BD",
       "status": "Business Development",
-      "priority": "Low",
-      "url": "https://www.notion.so/2f79e3a81ab380848924d21f9fe96df6"
-    },
-    {
-      "name": "DCI BIDV Exp 2026",
-      "status": "Business Development",
-      "priority": "Low",
-      "url": "https://www.notion.so/2f69e3a81ab38076b271d409a5b00339"
-    },
-    {
-      "name": "NOKIA GENERAL",
-      "status": "In Progress",
-      "priority": "Low",
-      "category": "NOKIA",
-      "url": "https://www.notion.so/1fa9e3a81ab38108ae27de9f3871970a"
-    },
-    {
-      "name": "Setting up the new Notion Workspace",
-      "status": "In Progress",
-      "priority": "Medium",
-      "category": "PERSONAL",
-      "url": "https://www.notion.so/2449e3a81ab3805c891dfccded9de803"
-    },
-    {
-      "name": "Xây nhà ở Quê",
-      "status": "Planning",
-      "priority": "High",
-      "category": "PERSONAL",
-      "url": "https://www.notion.so/2629e3a81ab3801f92d4c94ec73f65b8"
-    },
-    {
-      "name": "OUR LUMI",
-      "status": "Planning",
-      "priority": "High",
-      "category": "PERSONAL",
-      "url": "https://www.notion.so/26a9e3a81ab380a1abc2de0efec5f7b8"
-    },
-    {
-      "name": "CÁNH HẠC BAY",
-      "status": "Planning",
-      "priority": "Medium",
-      "category": "PERSONAL",
-      "url": "https://www.notion.so/2f39e3a81ab380dcab3af42ce0e7f008"
+      "url": "https://www.notion.so/3569e3a81ab380ef8134d491a77a8e4a"
     }
   ]
 }
