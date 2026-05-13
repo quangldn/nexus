@@ -1,0 +1,42 @@
+{
+  "_comment": "Edit this file to control what's pinned on the Product Wiki Home page. 'extras' = docs to add that aren't in the xlsx (e.g. roadmap files). 'important' = list of document names (exact match) to mark Important.",
+  "important": [],
+  "extras": [
+    {
+      "name": "1830 GX Roadmap Update",
+      "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20GX%20Transcend%20v1.0.pptx?d=w93c0d12d75e64c3db5e7bbd1212cbef3",
+      "description": "GX Transcend v1.0 — Apr '26 roadmap",
+      "portfolio": ["GX"],
+      "tags": ["Exec Overview", "Roadmap"],
+      "important": true,
+      "lastEdited": ""
+    },
+    {
+      "name": "1830 PSS Roadmap Update",
+      "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20PSS%20PSI-M%20PSD%20WaveSuite%20v1.0.pptx?d=wfcda4dda0eb14f60a351706989b34938",
+      "description": "PSS / PSI-M / PSD / WaveSuite v1.0 — Apr '26 roadmap",
+      "portfolio": ["PSS", "PSI-M", "PSD", "Wavesuite"],
+      "tags": ["Exec Overview", "Roadmap"],
+      "important": true,
+      "lastEdited": ""
+    },
+    {
+      "name": "Optical Networks Portfolio Overview - Roadmap Update",
+      "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Optical%20Networks%20Portfolio%20Overview%20and%20Evolution%20Apr'26.pptx?d=w78b8ec0cb8ac4fda8cffd5db24054bbf",
+      "description": "Optical Networks Portfolio Overview & Evolution — Apr '26",
+      "portfolio": ["GX", "PSS", "ICE-X", "Wavesuite"],
+      "tags": ["Exec Overview", "Roadmap"],
+      "important": true,
+      "lastEdited": ""
+    },
+    {
+      "name": "Pluggables Roadmap Update",
+      "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20Pluggables%20%26%20Components%20v1.0.pptx?d=wc4b3ad7e44384dc0b27452d69d6c70e8",
+      "description": "Pluggables & Components v1.0 — Apr '26 roadmap",
+      "portfolio": ["ICE-X"],
+      "tags": ["Exec Overview", "Roadmap"],
+      "important": true,
+      "lastEdited": ""
+    }
+  ]
+}
