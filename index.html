@@ -954,11 +954,10 @@
       title.textContent = 'Product Wiki Home Page';
       content.appendChild(title);
 
-      // LEFT col: Roadmap (highlighted = Important + Roadmap, list = rest)
-      // RIGHT col: Frequent use (highlighted = top Important non-Roadmap, list = rest of Important)
-      const roadmapImp = docs.filter(d => hasTag(d, 'Roadmap') && d.important);
-      const roadmapRest = docs.filter(d => hasTag(d, 'Roadmap') && !d.important);
-      const freqImp = docs.filter(d => d.important && !hasTag(d, 'Roadmap'));
+      // LEFT col: ROADMAP — fixed callout + 4 Important Roadmap docs
+      // RIGHT col: Frequent use — fixed callout + Important docs NOT tagged Roadmap
+      const roadmapDocs = docs.filter(d => d.important && hasTag(d, 'Roadmap'));
+      const freqDocs = docs.filter(d => d.important && !hasTag(d, 'Roadmap'));
 
       const homeGrid = document.createElement('div');
       homeGrid.className = 'wiki-home';
@@ -967,21 +966,17 @@
       const leftCol = document.createElement('div');
       leftCol.className = 'wiki-col';
       let leftHtml = '<h2>ROADMAP</h2>';
-      const roadmapFeatured = roadmapImp[0] || roadmapRest[0];
-      const roadmapList = (roadmapImp.length > 0 ? roadmapImp.slice(1).concat(roadmapRest) : roadmapRest.slice(1));
-      if (roadmapFeatured) {
-        leftHtml += `
-          <a class="wiki-featured" href="${escapeAttr(roadmapFeatured.url)}" target="_blank" rel="noopener">
-            <span class="bulb">💡</span>
-            <span class="ft-title">${escapeHtml(roadmapFeatured.name)}</span>
-          </a>
-        `;
-      }
+      leftHtml += `
+        <div class="wiki-featured" style="cursor:default">
+          <span class="bulb">💡</span>
+          <span class="ft-title">Latest Roadmap Update - Q2-26</span>
+        </div>
+      `;
       leftHtml += '<div class="wiki-list">';
-      if (roadmapList.length === 0 && !roadmapFeatured) {
-        leftHtml += '<div class="wiki-list-item empty-note">No Roadmap-tagged docs yet.</div>';
+      if (roadmapDocs.length === 0) {
+        leftHtml += '<div class="wiki-list-item empty-note">Mark roadmap docs as Important in Notion to pin them here.</div>';
       } else {
-        roadmapList.forEach(d => {
+        roadmapDocs.forEach(d => {
           leftHtml += `<a class="wiki-list-item" href="${escapeAttr(d.url)}" target="_blank" rel="noopener" data-search="${escapeAttr(d.name.toLowerCase())}">${escapeHtml(d.name)}</a>`;
         });
       }
@@ -993,28 +988,17 @@
       const rightCol = document.createElement('div');
       rightCol.className = 'wiki-col';
       let rightHtml = '<h2>Frequent use</h2>';
-      const freqFeatured = freqImp[0];
-      const freqList = freqImp.slice(1);
-      if (freqFeatured) {
-        rightHtml += `
-          <a class="wiki-featured" href="${escapeAttr(freqFeatured.url)}" target="_blank" rel="noopener">
-            <span class="bulb">💡</span>
-            <span class="ft-title">${escapeHtml(freqFeatured.name)}</span>
-          </a>
-        `;
-      } else {
-        rightHtml += `
-          <div class="wiki-featured" style="cursor:default">
-            <span class="bulb">💡</span>
-            <span class="ft-title" style="opacity:.65">No important docs pinned yet — mark docs as Important in Notion.</span>
-          </div>
-        `;
-      }
+      rightHtml += `
+        <div class="wiki-featured" style="cursor:default">
+          <span class="bulb">💡</span>
+          <span class="ft-title">Important files</span>
+        </div>
+      `;
       rightHtml += '<div class="wiki-list">';
-      if (freqList.length === 0) {
-        rightHtml += '<div class="wiki-list-item empty-note">Mark more docs as Important in Notion to fill this list.</div>';
+      if (freqDocs.length === 0) {
+        rightHtml += '<div class="wiki-list-item empty-note">Mark non-roadmap docs as Important in Notion to fill this list.</div>';
       } else {
-        freqList.forEach(d => {
+        freqDocs.forEach(d => {
           rightHtml += `<a class="wiki-list-item" href="${escapeAttr(d.url)}" target="_blank" rel="noopener" data-search="${escapeAttr(d.name.toLowerCase())}">${escapeHtml(d.name)}</a>`;
         });
       }
