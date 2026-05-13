@@ -480,6 +480,25 @@
   ]);
   if (!data) { showError('Cannot continue without data.json.'); return; }
 
+  // Tag → CSS chip-class lookup (used by renderDocRow). Must be declared BEFORE
+  // tabs.forEach below to avoid temporal-dead-zone error when the Products Wiki
+  // tab renders.
+  const TAG_CATEGORY = {
+    'Exec Overview': 'tag-doctype', 'Deep Dive': 'tag-doctype', 'Sales Presentation': 'tag-doctype',
+    'Datasheet': 'tag-doctype', 'Whitepaper': 'tag-doctype', 'Application Note': 'tag-doctype',
+    'GRTS': 'tag-doctype', 'Release Notes': 'tag-doctype', 'Roadmap': 'tag-doctype',
+    'Pricing & Licensing': 'tag-doctype', 'Case Study': 'tag-doctype', 'Visio Stencil': 'tag-doctype',
+    'Customer-facing': 'tag-audience', 'Internal': 'tag-audience', 'Partner': 'tag-audience',
+    'Competitive Intel': 'tag-audience',
+    'DCI': 'tag-topic', 'Subsea': 'tag-topic', 'Long Haul': 'tag-topic',
+    'Metro': 'tag-topic', 'Mission Critical': 'tag-topic', 'Sustainability': 'tag-topic',
+    'AI / Data Center': 'tag-topic', '5G / Mobile': 'tag-topic',
+    'Demo Video': 'tag-tech', 'Webinar': 'tag-tech',
+    'Quantum-Safe': 'tag-tech', 'Fiber Sensing': 'tag-tech', 'Automation': 'tag-tech',
+    'Pluggables': 'tag-tech', 'OTN': 'tag-tech', 'Sync / Timing': 'tag-tech',
+    'IP-Optical': 'tag-tech', 'ROADM': 'tag-tech',
+  };
+
   const tabs = data.tabs || [];
   tabs.forEach((t, i) => {
     const btn = document.createElement('button');
@@ -761,21 +780,7 @@
   }
 
   // ===== Documents (Product Wiki) =====
-  const TAG_CATEGORY = {
-    'Exec Overview': 'tag-doctype', 'Deep Dive': 'tag-doctype', 'Sales Presentation': 'tag-doctype',
-    'Datasheet': 'tag-doctype', 'Whitepaper': 'tag-doctype', 'Application Note': 'tag-doctype',
-    'GRTS': 'tag-doctype', 'Release Notes': 'tag-doctype', 'Roadmap': 'tag-doctype',
-    'Pricing & Licensing': 'tag-doctype', 'Case Study': 'tag-doctype', 'Visio Stencil': 'tag-doctype',
-    'Customer-facing': 'tag-audience', 'Internal': 'tag-audience', 'Partner': 'tag-audience',
-    'Competitive Intel': 'tag-audience',
-    'DCI': 'tag-topic', 'Subsea': 'tag-topic', 'Long Haul': 'tag-topic',
-    'Metro': 'tag-topic', 'Mission Critical': 'tag-topic', 'Sustainability': 'tag-topic',
-    'AI / Data Center': 'tag-topic', '5G / Mobile': 'tag-topic',
-    'Demo Video': 'tag-tech', 'Webinar': 'tag-tech',
-    'Quantum-Safe': 'tag-tech', 'Fiber Sensing': 'tag-tech', 'Automation': 'tag-tech',
-    'Pluggables': 'tag-tech', 'OTN': 'tag-tech', 'Sync / Timing': 'tag-tech',
-    'IP-Optical': 'tag-tech', 'ROADM': 'tag-tech',
-  };
+  // TAG_CATEGORY is declared earlier (above tabs.forEach) to avoid TDZ.
 
   function renderDocRow(d) {
     const search = [d.name, d.description, (d.portfolio || []).join(' '), (d.tags || []).join(' ')]
