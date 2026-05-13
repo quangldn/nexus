@@ -295,6 +295,98 @@
     border-color: var(--navy);
   }
 
+  /* ===== My Pins (drag-drop scratchpad, localStorage) ===== */
+  .pins-toolbar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .pins-btn {
+    background: var(--navy); color: white; border: none;
+    padding: 8px 14px; border-radius: 8px;
+    font: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: background .12s;
+  }
+  .pins-btn:hover { background: var(--navy-dark); }
+  .pins-btn.ghost {
+    background: transparent; color: var(--navy);
+    border: 1px solid var(--border-strong);
+  }
+  .pins-btn.ghost:hover { background: var(--navy-soft); }
+  .pins-hint {
+    margin-left: auto; color: var(--muted); font-size: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pins-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    align-items: start;
+  }
+  .pin-block {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+    min-height: 130px;
+  }
+  .pin-block.drag-over {
+    border-color: var(--navy); background: var(--navy-tint);
+    box-shadow: 0 0 0 3px rgba(18,65,145,.1);
+  }
+  .pin-block-head {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 10px;
+  }
+  .pin-block-name {
+    flex: 1; font: inherit; font-weight: 600; font-size: 14px;
+    color: var(--text); border: 1px solid transparent;
+    background: transparent;
+    padding: 5px 8px; border-radius: 6px;
+    transition: background .12s, border-color .12s;
+    min-width: 0;
+  }
+  .pin-block-name:hover { background: var(--panel-2); }
+  .pin-block-name:focus {
+    background: #fff; border-color: var(--navy);
+    outline: none;
+  }
+  .pin-block-del {
+    color: var(--muted); cursor: pointer;
+    padding: 4px 8px; border-radius: 4px;
+    font-size: 13px; user-select: none;
+    transition: background .12s, color .12s;
+  }
+  .pin-block-del:hover {
+    background: rgba(220,38,38,.08); color: var(--danger);
+  }
+  .pin-empty {
+    color: var(--muted); font-size: 12px; font-style: italic;
+    padding: 14px 8px; text-align: center;
+    border: 1px dashed var(--border-strong); border-radius: 6px;
+  }
+  .pin-list {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .pin-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: 6px;
+    text-decoration: none; color: var(--text);
+    font-size: 13px; cursor: grab;
+    transition: background .12s;
+  }
+  .pin-item:hover { background: var(--navy-tint); }
+  .pin-item:active { cursor: grabbing; }
+  .pin-item.dragging { opacity: 0.4; }
+  .pin-title {
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .pin-host { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+  .pin-x {
+    color: var(--muted); padding: 2px 6px;
+    opacity: 0; cursor: pointer; flex-shrink: 0;
+    transition: opacity .12s, color .12s;
+  }
+  .pin-item:hover .pin-x { opacity: 1; }
+  .pin-x:hover { color: var(--danger); }
+
   /* Home: 2-column layout */
   .wiki-home {
     display: grid; gap: 28px;
@@ -918,11 +1010,39 @@
 
     const VIEWS = [
       { id: 'home', label: '🏠 Home' },
+      { id: 'pins', label: '📌 My Pins' },
       { id: 'roadmap', label: '🗺️ Roadmap', filter: d => hasTag(d, 'Roadmap') },
       { id: 'gx', label: '📡 1830 GX', filter: d => hasPortfolio(d, 'GX') },
       { id: 'pss', label: '📡 1830 PSS', filter: d => hasPortfolio(d, 'PSS') },
       { id: 'others', label: '📂 Others', filter: d => !hasPortfolio(d, 'GX') && !hasPortfolio(d, 'PSS') },
     ];
+
+    // === My Pins state helpers (localStorage-only, Nokia laptop scratch-pad) ===
+    const PINS_KEY = 'nexus.pins';
+    const pinsUid = pfx => pfx + Math.random().toString(36).slice(2, 9);
+    function loadPins() {
+      try {
+        const raw = localStorage.getItem(PINS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.blocks)) return parsed;
+        }
+      } catch (e) {}
+      return { blocks: [
+        { id: pinsUid('b_'), name: 'Quick links', links: [] }
+      ] };
+    }
+    function savePins(state) {
+      try { localStorage.setItem(PINS_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+    function pinsTotal() {
+      try {
+        const raw = localStorage.getItem(PINS_KEY);
+        if (!raw) return 0;
+        const p = JSON.parse(raw);
+        return (p.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+      } catch (e) { return 0; }
+    }
 
     // Dropdown selector
     const switcher = document.createElement('div');
@@ -934,6 +1054,7 @@
       opt.value = v.id;
       let count = '';
       if (v.id === 'home') count = ` (${docs.filter(d => d.important).length} ⭐)`;
+      else if (v.id === 'pins') count = ` (${pinsTotal()})`;
       else if (v.filter) count = ` (${docs.filter(v.filter).length})`;
       opt.textContent = v.label + count;
       sel.appendChild(opt);
@@ -1035,8 +1156,266 @@
     function activateView(id) {
       sel.value = id;
       if (id === 'home') renderHome();
+      else if (id === 'pins') renderPins();
       else renderFiltered(id);
       try { localStorage.setItem('nexus.productsView', id); } catch (e) {}
+      // Refresh pins count in dropdown label
+      const pinsOpt = [...sel.options].find(o => o.value === 'pins');
+      if (pinsOpt) pinsOpt.textContent = '📌 My Pins (' + pinsTotal() + ')';
+    }
+
+    // ===== My Pins view: drag URL from any tab into a block. localStorage only. =====
+    function renderPins() {
+      content.innerHTML = '';
+      let state = loadPins();
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'pins-toolbar';
+      toolbar.innerHTML = `
+        <button class="pins-btn" id="pins-add" type="button">+ Add block</button>
+        <button class="pins-btn ghost" id="pins-export" type="button" title="Download backup JSON">⬇ Export</button>
+        <button class="pins-btn ghost" id="pins-import" type="button" title="Restore from a backup JSON">⬆ Import</button>
+        <span class="pins-hint">Drag a tab from Edge onto a block to pin its URL.</span>
+      `;
+      content.appendChild(toolbar);
+
+      const grid = document.createElement('div');
+      grid.className = 'pins-grid';
+      content.appendChild(grid);
+
+      function refreshDropdownCount() {
+        const opt = [...sel.options].find(o => o.value === 'pins');
+        if (opt) opt.textContent = '📌 My Pins (' + pinsTotal() + ')';
+      }
+
+      function paint() {
+        grid.innerHTML = '';
+        state.blocks.forEach(block => {
+          const bEl = document.createElement('div');
+          bEl.className = 'pin-block';
+          bEl.dataset.blockId = block.id;
+
+          const head = document.createElement('div');
+          head.className = 'pin-block-head';
+          const nameInput = document.createElement('input');
+          nameInput.className = 'pin-block-name';
+          nameInput.type = 'text';
+          nameInput.value = block.name || '';
+          nameInput.placeholder = 'Block name';
+          nameInput.addEventListener('change', () => {
+            block.name = nameInput.value.trim() || 'Untitled';
+            savePins(state);
+          });
+          // prevent dragstart on input
+          nameInput.addEventListener('dragstart', e => e.stopPropagation());
+          head.appendChild(nameInput);
+
+          const delBtn = document.createElement('span');
+          delBtn.className = 'pin-block-del';
+          delBtn.textContent = '🗑';
+          delBtn.title = 'Delete block';
+          delBtn.addEventListener('click', () => {
+            const n = (block.links || []).length;
+            const msg = n > 0
+              ? `Delete block "${block.name}" and its ${n} pinned link${n > 1 ? 's' : ''}?`
+              : `Delete block "${block.name}"?`;
+            if (confirm(msg)) {
+              state.blocks = state.blocks.filter(b => b.id !== block.id);
+              savePins(state);
+              refreshDropdownCount();
+              paint();
+            }
+          });
+          head.appendChild(delBtn);
+          bEl.appendChild(head);
+
+          const list = document.createElement('div');
+          list.className = 'pin-list';
+          if (!block.links || block.links.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'pin-empty';
+            empty.textContent = 'Drop link here';
+            list.appendChild(empty);
+          } else {
+            block.links.forEach(link => {
+              const a = document.createElement('a');
+              a.className = 'pin-item';
+              a.href = link.url;
+              a.target = '_blank';
+              a.rel = 'noopener';
+              a.draggable = true;
+              a.dataset.linkId = link.id;
+              a.dataset.search = ((link.title || '') + ' ' + (link.url || '') + ' ' + (link.host || '')).toLowerCase();
+              a.innerHTML = `
+                <span class="pin-title" title="${escapeAttr(link.url)}">${escapeHtml(link.title || link.url)}</span>
+                <span class="pin-host">${escapeHtml(link.host || '')}</span>
+                <span class="pin-x" title="Remove">✕</span>
+              `;
+              // Rename on right-click / shift-click
+              a.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                const nt = prompt('Rename link:', link.title || '');
+                if (nt !== null) {
+                  link.title = nt.trim() || link.url;
+                  savePins(state);
+                  paint();
+                }
+              });
+              a.querySelector('.pin-x').addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                block.links = block.links.filter(l => l.id !== link.id);
+                savePins(state);
+                refreshDropdownCount();
+                paint();
+              });
+              a.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('application/x-nexus-pin', JSON.stringify({ blockId: block.id, linkId: link.id }));
+                e.dataTransfer.effectAllowed = 'move';
+                a.classList.add('dragging');
+              });
+              a.addEventListener('dragend', () => a.classList.remove('dragging'));
+              list.appendChild(a);
+            });
+          }
+          bEl.appendChild(list);
+
+          // Drag-over visual + drop handler on the whole block
+          bEl.addEventListener('dragover', e => {
+            e.preventDefault();
+            bEl.classList.add('drag-over');
+            const isInternal = e.dataTransfer.types.includes('application/x-nexus-pin');
+            e.dataTransfer.dropEffect = isInternal ? 'move' : 'copy';
+          });
+          bEl.addEventListener('dragleave', e => {
+            if (e.target === bEl || !bEl.contains(e.relatedTarget)) {
+              bEl.classList.remove('drag-over');
+            }
+          });
+          bEl.addEventListener('drop', e => {
+            e.preventDefault();
+            bEl.classList.remove('drag-over');
+
+            // 1) Internal move between blocks
+            const internal = e.dataTransfer.getData('application/x-nexus-pin');
+            if (internal) {
+              try {
+                const { blockId, linkId } = JSON.parse(internal);
+                if (blockId === block.id) return;
+                const src = state.blocks.find(b => b.id === blockId);
+                if (!src) return;
+                const idx = (src.links || []).findIndex(l => l.id === linkId);
+                if (idx < 0) return;
+                const [moved] = src.links.splice(idx, 1);
+                block.links = block.links || [];
+                block.links.push(moved);
+                savePins(state);
+                paint();
+              } catch (err) {}
+              return;
+            }
+
+            // 2) External URL drop (from Edge tab, bookmark, or address bar)
+            const uri = e.dataTransfer.getData('text/uri-list') || '';
+            const plain = e.dataTransfer.getData('text/plain') || '';
+            const html = e.dataTransfer.getData('text/html') || '';
+            const raw = uri || plain;
+            const urls = raw.split(/\r?\n/).map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+            if (urls.length === 0) {
+              showToast('No URL detected in drop');
+              return;
+            }
+
+            // Try to read a title from text/html (Edge sends "<a href=...>title</a>")
+            let titleFromHtml = '';
+            if (html) {
+              const m = html.match(/<a[^>]*>([\s\S]*?)<\/a>/i);
+              if (m) {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = m[1];
+                titleFromHtml = (tmp.textContent || '').trim();
+              }
+            }
+
+            let added = 0;
+            urls.forEach(u => {
+              let host = '';
+              let defaultTitle = u;
+              try {
+                const parsed = new URL(u);
+                host = parsed.hostname.replace(/^www\./, '');
+                const lastSeg = parsed.pathname.split('/').filter(Boolean).pop();
+                defaultTitle = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
+              } catch (err) {
+                return; // not a valid URL, skip
+              }
+              block.links = block.links || [];
+              block.links.push({
+                id: pinsUid('p_'),
+                title: titleFromHtml || defaultTitle,
+                url: u,
+                host: host,
+                added: new Date().toISOString()
+              });
+              added++;
+            });
+            if (added > 0) {
+              savePins(state);
+              refreshDropdownCount();
+              paint();
+              showToast('Pinned ' + added + ' link' + (added > 1 ? 's' : '') + ' to "' + (block.name || 'block') + '"');
+            } else {
+              showToast('Could not parse a URL from the drop');
+            }
+          });
+
+          grid.appendChild(bEl);
+        });
+      }
+      paint();
+
+      toolbar.querySelector('#pins-add').addEventListener('click', () => {
+        state.blocks.push({ id: pinsUid('b_'), name: 'New block', links: [] });
+        savePins(state);
+        paint();
+      });
+      toolbar.querySelector('#pins-export').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'nexus-pins-' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      });
+      toolbar.querySelector('#pins-import').addEventListener('click', () => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'application/json,.json';
+        inp.addEventListener('change', () => {
+          const file = inp.files && inp.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const parsed = JSON.parse(reader.result);
+              if (!parsed || !Array.isArray(parsed.blocks)) throw new Error('Bad format');
+              if (!confirm('Replace current pins with imported data?')) return;
+              state = parsed;
+              savePins(state);
+              refreshDropdownCount();
+              paint();
+              showToast('Imported');
+            } catch (e) {
+              showToast('Import failed: ' + (e.message || e));
+            }
+          };
+          reader.readAsText(file);
+        });
+        inp.click();
+      });
     }
 
     sel.addEventListener('change', () => activateView(sel.value));
@@ -1068,6 +1447,21 @@
       const hit = !q || el.dataset.search.includes(q);
       el.classList.toggle('hidden', !hit);
     });
+  });
+
+  // ---- Prevent the browser from navigating when a URL is dropped outside a pin block ----
+  window.addEventListener('dragover', e => {
+    if (e.dataTransfer && e.dataTransfer.types && (e.dataTransfer.types.includes('text/uri-list') || e.dataTransfer.types.includes('text/plain'))) {
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('drop', e => {
+    if (!e.target.closest('.pin-block')) {
+      // Only block default if it looks like a URL drop (avoid breaking native form/file drops)
+      if (e.dataTransfer && e.dataTransfer.types && (e.dataTransfer.types.includes('text/uri-list') || e.dataTransfer.types.includes('text/plain'))) {
+        e.preventDefault();
+      }
+    }
   });
 
   // ---- Local path copy ----
