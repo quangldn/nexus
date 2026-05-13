@@ -268,24 +268,83 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     max-width: 360px; opacity: 0.85;
   }
-  .subnav {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-bottom: 18px;
+  /* Product Wiki view-switcher dropdown */
+  .view-switcher {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 22px;
   }
-  .subnav-btn {
+  .view-switcher label {
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .view-switcher select {
     background: var(--panel); color: var(--text);
-    border: 1px solid var(--border);
-    padding: 7px 14px; border-radius: 999px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    transition: all .12s;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    padding: 8px 32px 8px 14px;
+    font: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer; outline: none;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235f6776' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color .12s;
+    min-width: 180px;
   }
-  .subnav-btn:hover { border-color: var(--navy); color: var(--navy); }
-  .subnav-btn.active {
-    background: var(--navy); color: white; border-color: var(--navy);
+  .view-switcher select:hover, .view-switcher select:focus {
+    border-color: var(--navy);
   }
-  .subnav-btn .count {
-    display: inline-block; margin-left: 6px;
-    font-size: 11px; opacity: 0.7;
+
+  /* Home: 2-column layout */
+  .wiki-home {
+    display: grid; gap: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+  .wiki-col h2 {
+    font-size: 22px; font-weight: 700;
+    margin: 0 0 14px; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .wiki-featured {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #2a2d35 0%, #1f2229 100%);
+    color: #e8e9ed;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    text-decoration: none;
+    transition: transform .12s;
+  }
+  .wiki-featured:hover { transform: translateY(-1px); }
+  .wiki-featured .bulb {
+    font-size: 22px; flex-shrink: 0;
+  }
+  .wiki-featured .ft-title {
+    flex: 1; font-size: 15px; font-weight: 500;
+    color: #fff;
+  }
+  .wiki-list { display: flex; flex-direction: column; gap: 2px; }
+  .wiki-list-item {
+    padding: 8px 4px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 15px;
+    border-radius: 4px;
+    transition: background .12s, padding .12s;
+  }
+  .wiki-list-item:hover {
+    background: var(--navy-tint);
+    padding-left: 10px;
+  }
+  .wiki-list-item.empty-note {
+    color: var(--muted); font-style: italic; font-size: 13px;
+    padding: 8px 0;
+  }
+  /* Title used at top of wiki home */
+  .wiki-title {
+    font-size: 26px; font-weight: 700;
+    margin: 0 0 24px; color: var(--text);
+    letter-spacing: -0.01em;
   }
   .doc-section { margin-bottom: 26px; }
   .doc-section h3 {
@@ -857,7 +916,7 @@
     const hasPortfolio = (d, code) => (d.portfolio || []).some(p => p === code);
     const hasTag = (d, tg) => (d.tags || []).some(x => x === tg);
 
-    const SUBTABS = [
+    const VIEWS = [
       { id: 'home', label: '🏠 Home' },
       { id: 'roadmap', label: '🗺️ Roadmap', filter: d => hasTag(d, 'Roadmap') },
       { id: 'gx', label: '📡 1830 GX', filter: d => hasPortfolio(d, 'GX') },
@@ -865,24 +924,23 @@
       { id: 'others', label: '📂 Others', filter: d => !hasPortfolio(d, 'GX') && !hasPortfolio(d, 'PSS') },
     ];
 
-    const subnav = document.createElement('div');
-    subnav.className = 'subnav';
-    SUBTABS.forEach(st => {
-      const btn = document.createElement('button');
-      btn.className = 'subnav-btn' + (st.id === 'home' ? ' active' : '');
-      btn.dataset.subtab = st.id;
+    // Dropdown selector
+    const switcher = document.createElement('div');
+    switcher.className = 'view-switcher';
+    const sel = document.createElement('select');
+    sel.id = 'wiki-view';
+    VIEWS.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.id;
       let count = '';
-      if (st.id === 'home') {
-        const c = docs.filter(d => d.important).length;
-        count = c ? `<span class="count">${c}</span>` : '';
-      } else if (st.filter) {
-        const c = docs.filter(st.filter).length;
-        count = c ? `<span class="count">${c}</span>` : '';
-      }
-      btn.innerHTML = `${st.label}${count}`;
-      subnav.appendChild(btn);
+      if (v.id === 'home') count = ` (${docs.filter(d => d.important).length} ⭐)`;
+      else if (v.filter) count = ` (${docs.filter(v.filter).length})`;
+      opt.textContent = v.label + count;
+      sel.appendChild(opt);
     });
-    wrap.appendChild(subnav);
+    switcher.innerHTML = '<label for="wiki-view">View:</label>';
+    switcher.appendChild(sel);
+    wrap.appendChild(switcher);
 
     const content = document.createElement('div');
     content.className = 'doc-content';
@@ -890,50 +948,86 @@
 
     function renderHome() {
       content.innerHTML = '';
-      const blocks = [
-        {
-          name: '🗺️ Roadmap',
-          subtab: 'roadmap',
-          docs: docs.filter(d => hasTag(d, 'Roadmap') && d.important).length > 0
-            ? docs.filter(d => hasTag(d, 'Roadmap') && d.important)
-            : docs.filter(d => hasTag(d, 'Roadmap')).slice(0, 5),
-        },
-        {
-          name: '📡 1830 GX — Important',
-          subtab: 'gx',
-          docs: docs.filter(d => hasPortfolio(d, 'GX') && d.important),
-        },
-        {
-          name: '📡 1830 PSS — Important',
-          subtab: 'pss',
-          docs: docs.filter(d => hasPortfolio(d, 'PSS') && d.important),
-        },
-      ];
-      blocks.forEach(b => {
-        const section = document.createElement('div');
-        section.className = 'doc-section';
-        const header = document.createElement('div');
-        header.className = 'home-section-header';
-        header.innerHTML = `
-          <h3>${escapeHtml(b.name)} <span class="grp-count">${b.docs.length}</span></h3>
-          <span class="see-all" data-go="${escapeAttr(b.subtab)}">See all →</span>
+
+      const title = document.createElement('h1');
+      title.className = 'wiki-title';
+      title.textContent = 'Product Wiki Home Page';
+      content.appendChild(title);
+
+      // LEFT col: Roadmap (highlighted = Important + Roadmap, list = rest)
+      // RIGHT col: Frequent use (highlighted = top Important non-Roadmap, list = rest of Important)
+      const roadmapImp = docs.filter(d => hasTag(d, 'Roadmap') && d.important);
+      const roadmapRest = docs.filter(d => hasTag(d, 'Roadmap') && !d.important);
+      const freqImp = docs.filter(d => d.important && !hasTag(d, 'Roadmap'));
+
+      const homeGrid = document.createElement('div');
+      homeGrid.className = 'wiki-home';
+
+      // === LEFT: ROADMAP ===
+      const leftCol = document.createElement('div');
+      leftCol.className = 'wiki-col';
+      let leftHtml = '<h2>ROADMAP</h2>';
+      const roadmapFeatured = roadmapImp[0] || roadmapRest[0];
+      const roadmapList = (roadmapImp.length > 0 ? roadmapImp.slice(1).concat(roadmapRest) : roadmapRest.slice(1));
+      if (roadmapFeatured) {
+        leftHtml += `
+          <a class="wiki-featured" href="${escapeAttr(roadmapFeatured.url)}" target="_blank" rel="noopener">
+            <span class="bulb">💡</span>
+            <span class="ft-title">${escapeHtml(roadmapFeatured.name)}</span>
+          </a>
         `;
-        section.appendChild(header);
-        if (b.docs.length === 0) {
-          const empty = document.createElement('div');
-          empty.className = 'empty';
-          empty.innerHTML = `Mark any doc as <strong>Important</strong> in Notion to pin it here.`;
-          section.appendChild(empty);
-        } else {
-          section.appendChild(renderDocTable(b.docs));
-        }
-        content.appendChild(section);
-      });
+      }
+      leftHtml += '<div class="wiki-list">';
+      if (roadmapList.length === 0 && !roadmapFeatured) {
+        leftHtml += '<div class="wiki-list-item empty-note">No Roadmap-tagged docs yet.</div>';
+      } else {
+        roadmapList.forEach(d => {
+          leftHtml += `<a class="wiki-list-item" href="${escapeAttr(d.url)}" target="_blank" rel="noopener" data-search="${escapeAttr(d.name.toLowerCase())}">${escapeHtml(d.name)}</a>`;
+        });
+      }
+      leftHtml += '</div>';
+      leftCol.innerHTML = leftHtml;
+      homeGrid.appendChild(leftCol);
+
+      // === RIGHT: Frequent use ===
+      const rightCol = document.createElement('div');
+      rightCol.className = 'wiki-col';
+      let rightHtml = '<h2>Frequent use</h2>';
+      const freqFeatured = freqImp[0];
+      const freqList = freqImp.slice(1);
+      if (freqFeatured) {
+        rightHtml += `
+          <a class="wiki-featured" href="${escapeAttr(freqFeatured.url)}" target="_blank" rel="noopener">
+            <span class="bulb">💡</span>
+            <span class="ft-title">${escapeHtml(freqFeatured.name)}</span>
+          </a>
+        `;
+      } else {
+        rightHtml += `
+          <div class="wiki-featured" style="cursor:default">
+            <span class="bulb">💡</span>
+            <span class="ft-title" style="opacity:.65">No important docs pinned yet — mark docs as Important in Notion.</span>
+          </div>
+        `;
+      }
+      rightHtml += '<div class="wiki-list">';
+      if (freqList.length === 0) {
+        rightHtml += '<div class="wiki-list-item empty-note">Mark more docs as Important in Notion to fill this list.</div>';
+      } else {
+        freqList.forEach(d => {
+          rightHtml += `<a class="wiki-list-item" href="${escapeAttr(d.url)}" target="_blank" rel="noopener" data-search="${escapeAttr(d.name.toLowerCase())}">${escapeHtml(d.name)}</a>`;
+        });
+      }
+      rightHtml += '</div>';
+      rightCol.innerHTML = rightHtml;
+      homeGrid.appendChild(rightCol);
+
+      content.appendChild(homeGrid);
     }
 
-    function renderFiltered(subtab) {
+    function renderFiltered(viewId) {
       content.innerHTML = '';
-      const def = SUBTABS.find(s => s.id === subtab);
+      const def = VIEWS.find(s => s.id === viewId);
       if (!def || !def.filter) { renderHome(); return; }
       const filtered = docs.filter(def.filter);
       filtered.sort((a, b) => {
@@ -954,30 +1048,21 @@
       content.appendChild(section);
     }
 
-    function activateSubtab(id) {
-      subnav.querySelectorAll('.subnav-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.subtab === id);
-      });
+    function activateView(id) {
+      sel.value = id;
       if (id === 'home') renderHome();
       else renderFiltered(id);
-      try { localStorage.setItem('nexus.productsSubtab', id); } catch (e) {}
+      try { localStorage.setItem('nexus.productsView', id); } catch (e) {}
     }
 
-    subnav.addEventListener('click', e => {
-      const btn = e.target.closest('.subnav-btn');
-      if (btn) activateSubtab(btn.dataset.subtab);
-    });
-    content.addEventListener('click', e => {
-      const go = e.target.closest('[data-go]');
-      if (go) activateSubtab(go.dataset.go);
-    });
+    sel.addEventListener('change', () => activateView(sel.value));
 
     let initial = 'home';
     try {
-      const sub = localStorage.getItem('nexus.productsSubtab');
-      if (sub && SUBTABS.find(s => s.id === sub)) initial = sub;
+      const sub = localStorage.getItem('nexus.productsView');
+      if (sub && VIEWS.find(s => s.id === sub)) initial = sub;
     } catch (e) {}
-    activateSubtab(initial);
+    activateView(initial);
 
     if (documents.lastSync) {
       const sync = document.createElement('div');
