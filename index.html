@@ -293,6 +293,104 @@
     max-width: 360px; opacity: 0.85;
   }
 
+  /* ===== Documents (Product Wiki) ===== */
+  .subnav {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .subnav-btn {
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--border);
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all .12s;
+  }
+  .subnav-btn:hover { border-color: var(--navy); color: var(--navy); }
+  .subnav-btn.active {
+    background: var(--navy); color: white; border-color: var(--navy);
+  }
+  .subnav-btn .count {
+    display: inline-block; margin-left: 6px;
+    font-size: 11px; opacity: 0.7;
+  }
+  .doc-section { margin-bottom: 26px; }
+  .doc-section h3 {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .doc-section h3 .grp-count {
+    font-size: 11px; padding: 1px 7px; border-radius: 8px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--muted); letter-spacing: 0;
+  }
+  .doc-table {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .doc-row {
+    display: block;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none; color: var(--text);
+    transition: background .12s;
+  }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-row:hover { background: var(--navy-tint); }
+  .doc-row .row-top {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .doc-row .dname {
+    font-weight: 600; font-size: 14px; flex: 1; min-width: 200px;
+    word-break: break-word;
+  }
+  .doc-row .dname.important::before {
+    content: "⭐ "; margin-right: 2px;
+  }
+  .doc-row .row-desc {
+    margin-top: 6px; font-size: 12.5px;
+    color: var(--text); opacity: 0.78;
+    padding: 6px 10px; background: var(--panel-2);
+    border-radius: 6px; border-left: 2px solid var(--navy-soft);
+    line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .doc-row .chips {
+    margin-top: 6px;
+    display: flex; flex-wrap: wrap; gap: 4px;
+  }
+  .doc-row .row-arrow {
+    color: var(--muted); font-size: 14px; flex-shrink: 0;
+  }
+  .chip {
+    font-size: 11px; padding: 2px 8px; border-radius: 10px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--muted); white-space: nowrap;
+  }
+  .chip.portfolio {
+    background: var(--navy-soft); color: var(--navy-dark);
+    border-color: var(--navy);
+    font-weight: 600;
+  }
+  .chip.tag-doctype { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+  .chip.tag-audience { background: #fed7aa; border-color: #fb923c; color: #9a3412; }
+  .chip.tag-topic { background: #fce7f3; border-color: #f472b6; color: #9d174d; }
+  .chip.tag-tech { background: #dbeafe; border-color: #60a5fa; color: #1e3a8a; }
+  .chip.tag-misc { background: #f3f4f6; border-color: #d1d5db; color: #4b5563; }
+  .home-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .home-section-header h3 {
+    margin: 0; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+  }
+  .home-section-header .see-all {
+    font-size: 12px; color: var(--navy); cursor: pointer; user-select: none;
+  }
+  .home-section-header .see-all:hover { text-decoration: underline; }
+
   /* ===== Misc ===== */
   .empty {
     background: var(--panel); border: 1px dashed var(--border-strong);
@@ -408,9 +506,10 @@
     }
   }
 
-  const [data, notion] = await Promise.all([
+  const [data, notion, documents] = await Promise.all([
     loadJson('data.json'),
-    loadJson('notion-projects.json')
+    loadJson('notion-projects.json'),
+    loadJson('notion-documents.json')
   ]);
   if (!data) { showError('Cannot continue without data.json.'); return; }
 
@@ -455,8 +554,250 @@
     if (t.type === 'boxes') frag.appendChild(renderBoxes(t.links || []));
     else if (t.type === 'list') frag.appendChild(renderList(t.groups || [{ name: '', links: t.links || [] }]));
     else if (t.type === 'notion') frag.appendChild(renderNotion(t));
+    else if (t.type === 'documents') frag.appendChild(renderDocuments(t));
     else frag.appendChild(renderList([{ name: '', links: t.links || [] }]));
     return frag;
+  }
+
+  // ===== Documents (Product Wiki) =====
+  // Classify a tag into a category for chip styling.
+  const TAG_CATEGORY = {
+    // Doc type → yellow
+    'Exec Overview': 'tag-doctype', 'Deep Dive': 'tag-doctype', 'Sales Presentation': 'tag-doctype',
+    'Datasheet': 'tag-doctype', 'Whitepaper': 'tag-doctype', 'Application Note': 'tag-doctype',
+    'GRTS': 'tag-doctype', 'Release Notes': 'tag-doctype', 'Roadmap': 'tag-doctype',
+    'Pricing & Licensing': 'tag-doctype', 'Case Study': 'tag-doctype', 'Visio Stencil': 'tag-doctype',
+    // Audience / sentiment → orange
+    'Customer-facing': 'tag-audience', 'Internal': 'tag-audience', 'Partner': 'tag-audience',
+    'Competitive Intel': 'tag-audience',
+    // Topic / Use Case → pink
+    'DCI': 'tag-topic', 'Subsea': 'tag-topic', 'Long Haul': 'tag-topic',
+    'Metro': 'tag-topic', 'Mission Critical': 'tag-topic', 'Sustainability': 'tag-topic',
+    'AI / Data Center': 'tag-topic', '5G / Mobile': 'tag-topic',
+    // Tech → blue
+    'Demo Video': 'tag-tech', 'Webinar': 'tag-tech',
+    'Quantum-Safe': 'tag-tech', 'Fiber Sensing': 'tag-tech', 'Automation': 'tag-tech',
+    'Pluggables': 'tag-tech', 'OTN': 'tag-tech', 'Sync / Timing': 'tag-tech',
+    'IP-Optical': 'tag-tech', 'ROADM': 'tag-tech',
+  };
+
+  function renderDocRow(d) {
+    const search = [d.name, d.description, (d.portfolio || []).join(' '), (d.tags || []).join(' ')]
+      .filter(Boolean).join(' ').toLowerCase();
+    const a = document.createElement('a');
+    a.className = 'doc-row';
+    a.href = d.url || '#';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.dataset.search = search;
+    a.dataset.portfolio = (d.portfolio || []).join('||').toLowerCase();
+    a.dataset.tags = (d.tags || []).join('||').toLowerCase();
+    a.dataset.important = d.important ? '1' : '0';
+
+    const chipParts = [];
+    (d.portfolio || []).forEach(p => {
+      chipParts.push(`<span class="chip portfolio">${escapeHtml(p)}</span>`);
+    });
+    (d.tags || []).forEach(tg => {
+      const cls = TAG_CATEGORY[tg] || 'tag-misc';
+      chipParts.push(`<span class="chip ${cls}">${escapeHtml(tg)}</span>`);
+    });
+    const chipsHtml = chipParts.length ? `<div class="chips">${chipParts.join('')}</div>` : '';
+
+    const descHtml = d.description
+      ? `<div class="row-desc">${escapeHtml(d.description)}</div>`
+      : '';
+
+    const nameCls = 'dname' + (d.important ? ' important' : '');
+
+    a.innerHTML = `
+      <div class="row-top">
+        <span class="${nameCls}">${escapeHtml(d.name)}</span>
+        <span class="row-arrow">↗</span>
+      </div>
+      ${descHtml}
+      ${chipsHtml}
+    `;
+    return a;
+  }
+
+  function renderDocTable(docs) {
+    const table = document.createElement('div');
+    table.className = 'doc-table';
+    docs.forEach(d => table.appendChild(renderDocRow(d)));
+    return table;
+  }
+
+  function renderDocuments(t) {
+    const wrap = document.createElement('div');
+    const hero = document.createElement('div');
+    hero.className = 'notion-hero';
+    const docCount = documents && Array.isArray(documents.documents) ? documents.documents.length : 0;
+    const importantCount = documents && Array.isArray(documents.documents)
+      ? documents.documents.filter(d => d.important).length : 0;
+    const syncUrl = t.syncWorkflowUrl || '';
+    hero.innerHTML = `
+      <div class="hero-icon">📚</div>
+      <div class="hero-text">
+        <h2>${escapeHtml(t.heroTitle || 'Product Wiki')}${docCount ? ` <span style="opacity:.7;font-weight:400;font-size:15px">· ${docCount} docs · ${importantCount} ⭐</span>` : ''}</h2>
+        <p>${escapeHtml(t.heroText || 'Snapshot of Document Vault. Auto-refreshed daily.')}</p>
+      </div>
+      <div class="hero-actions">
+        ${syncUrl ? `<a href="${escapeAttr(syncUrl)}" target="_blank" rel="noopener" class="hero-btn secondary" title="Opens GitHub Actions">🔄 Run sync now</a>` : ''}
+        ${t.notionUrl ? `<a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>` : ''}
+      </div>
+    `;
+    wrap.appendChild(hero);
+
+    if (!documents || !Array.isArray(documents.documents) || documents.documents.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.innerHTML = `No document snapshot yet.<br><br>Ask Claude on your personal laptop: <kbd>refresh documents</kbd> — it will pull Document Vault and push <kbd>notion-documents.json</kbd> to the repo.`;
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    const docs = documents.documents;
+    const hasPortfolio = (d, code) => (d.portfolio || []).some(p => p === code);
+    const hasTag = (d, tg) => (d.tags || []).some(x => x === tg);
+
+    // Sub-navigation
+    const SUBTABS = [
+      { id: 'home', label: '🏠 Home' },
+      { id: 'roadmap', label: '🗺️ Roadmap', filter: d => hasTag(d, 'Roadmap') },
+      { id: 'gx', label: '📡 1830 GX', filter: d => hasPortfolio(d, 'GX') },
+      { id: 'pss', label: '📡 1830 PSS', filter: d => hasPortfolio(d, 'PSS') },
+      { id: 'others', label: '📂 Others', filter: d => !hasPortfolio(d, 'GX') && !hasPortfolio(d, 'PSS') },
+    ];
+
+    // Build sub-nav with counts
+    const subnav = document.createElement('div');
+    subnav.className = 'subnav';
+    SUBTABS.forEach(st => {
+      const btn = document.createElement('button');
+      btn.className = 'subnav-btn' + (st.id === 'home' ? ' active' : '');
+      btn.dataset.subtab = st.id;
+      let count = '';
+      if (st.id === 'home') {
+        const c = docs.filter(d => d.important).length;
+        count = c ? `<span class="count">${c}</span>` : '';
+      } else if (st.filter) {
+        const c = docs.filter(st.filter).length;
+        count = c ? `<span class="count">${c}</span>` : '';
+      }
+      btn.innerHTML = `${st.label}${count}`;
+      subnav.appendChild(btn);
+    });
+    wrap.appendChild(subnav);
+
+    // Content container
+    const content = document.createElement('div');
+    content.className = 'doc-content';
+    wrap.appendChild(content);
+
+    function renderHome() {
+      content.innerHTML = '';
+      // Three blocks: Roadmap (important AND tagged Roadmap, OR just tagged Roadmap if no important matches),
+      //               Important GX, Important PSS
+      const blocks = [
+        {
+          name: '🗺️ Roadmap',
+          subtab: 'roadmap',
+          docs: docs.filter(d => hasTag(d, 'Roadmap') && d.important).length > 0
+            ? docs.filter(d => hasTag(d, 'Roadmap') && d.important)
+            : docs.filter(d => hasTag(d, 'Roadmap')).slice(0, 5),
+        },
+        {
+          name: '📡 1830 GX — Important',
+          subtab: 'gx',
+          docs: docs.filter(d => hasPortfolio(d, 'GX') && d.important),
+        },
+        {
+          name: '📡 1830 PSS — Important',
+          subtab: 'pss',
+          docs: docs.filter(d => hasPortfolio(d, 'PSS') && d.important),
+        },
+      ];
+      blocks.forEach(b => {
+        const section = document.createElement('div');
+        section.className = 'doc-section';
+        const header = document.createElement('div');
+        header.className = 'home-section-header';
+        header.innerHTML = `
+          <h3>${escapeHtml(b.name)} <span class="grp-count">${b.docs.length}</span></h3>
+          <span class="see-all" data-go="${escapeAttr(b.subtab)}">See all →</span>
+        `;
+        section.appendChild(header);
+        if (b.docs.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.innerHTML = `Mark any doc as <strong>Important</strong> in Notion to pin it here.`;
+          section.appendChild(empty);
+        } else {
+          section.appendChild(renderDocTable(b.docs));
+        }
+        content.appendChild(section);
+      });
+    }
+
+    function renderFiltered(subtab) {
+      content.innerHTML = '';
+      const def = SUBTABS.find(s => s.id === subtab);
+      if (!def || !def.filter) { renderHome(); return; }
+      const filtered = docs.filter(def.filter);
+      // Important first
+      filtered.sort((a, b) => {
+        if ((b.important?1:0) !== (a.important?1:0)) return (b.important?1:0) - (a.important?1:0);
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      const section = document.createElement('div');
+      section.className = 'doc-section';
+      section.innerHTML = `<h3>${escapeHtml(def.label)} <span class="grp-count">${filtered.length}</span></h3>`;
+      if (filtered.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No documents match this filter yet.';
+        section.appendChild(empty);
+      } else {
+        section.appendChild(renderDocTable(filtered));
+      }
+      content.appendChild(section);
+    }
+
+    function activateSubtab(id) {
+      subnav.querySelectorAll('.subnav-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.subtab === id);
+      });
+      if (id === 'home') renderHome();
+      else renderFiltered(id);
+      try { localStorage.setItem('nexus.productsSubtab', id); } catch (e) {}
+    }
+
+    subnav.addEventListener('click', e => {
+      const btn = e.target.closest('.subnav-btn');
+      if (btn) activateSubtab(btn.dataset.subtab);
+    });
+    content.addEventListener('click', e => {
+      const go = e.target.closest('[data-go]');
+      if (go) activateSubtab(go.dataset.go);
+    });
+
+    // Restore last-active subtab
+    let initial = 'home';
+    try {
+      const saved = localStorage.getItem('nexus.productsSubtab');
+      if (saved && SUBTABS.find(s => s.id === saved)) initial = saved;
+    } catch (e) {}
+    activateSubtab(initial);
+
+    if (documents.lastSync) {
+      const sync = document.createElement('div');
+      sync.style.cssText = 'margin-top:14px;font-size:11.5px;color:var(--muted)';
+      sync.textContent = 'Last Notion sync: ' + documents.lastSync + (documents.source ? ' · ' + documents.source : '');
+      wrap.appendChild(sync);
+    }
+
+    return wrap;
   }
 
   function renderBoxes(links) {

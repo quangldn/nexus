@@ -49,38 +49,11 @@
       "id": "products",
       "name": "Products Wiki",
       "icon": "📚",
-      "type": "list",
-      "groups": [
-        {
-          "name": "Roadmap Q2 2026",
-          "links": [
-            {
-              "title": "Optical Networks Portfolio Overview",
-              "note": "Roadmap update — Apr '26",
-              "icon": "🗺️",
-              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Optical%20Networks%20Portfolio%20Overview%20and%20Evolution%20Apr'26.pptx?d=w78b8ec0cb8ac4fda8cffd5db24054bbf"
-            },
-            {
-              "title": "1830 GX Roadmap",
-              "note": "GX Transcend v1.0",
-              "icon": "📡",
-              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20GX%20Transcend%20v1.0.pptx?d=w93c0d12d75e64c3db5e7bbd1212cbef3"
-            },
-            {
-              "title": "1830 PSS Roadmap",
-              "note": "PSS / PSI-M / PSD / WaveSuite v1.0",
-              "icon": "📡",
-              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20PSS%20PSI-M%20PSD%20WaveSuite%20v1.0.pptx?d=wfcda4dda0eb14f60a351706989b34938"
-            },
-            {
-              "title": "Pluggables Roadmap",
-              "note": "Pluggables & Components v1.0",
-              "icon": "🔌",
-              "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/Shared%20Documents/ON%20Consolidated%20Roadmap%202Q%202026/Detailed%20Roadmap%20Review%20Session%20Content/ON%20Consolidated%20Roadmap%20Apr%202026%20-%20Pluggables%20%26%20Components%20v1.0.pptx?d=wc4b3ad7e44384dc0b27452d69d6c70e8"
-            }
-          ]
-        }
-      ]
+      "type": "documents",
+      "notionUrl": "https://www.notion.so/35e9e3a81ab380cfa7d4c425ed8ec194?v=35e9e3a81ab3807e9a2a000c9c681929",
+      "syncWorkflowUrl": "https://github.com/quangldn/nexus/actions/workflows/notion-sync.yml",
+      "heroTitle": "Product Wiki",
+      "heroText": "Snapshot of Document Vault. Auto-refreshed daily. Use sub-tabs to filter by product line."
     },
     {
       "id": "projects",
