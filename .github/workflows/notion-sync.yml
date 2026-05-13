@@ -23,7 +23,7 @@ jobs:
 
       - name: Fetch Notion data
         env:
-          NOTION_TOKEN: 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
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: python scripts/fetch-notion.py
 
       - name: Commit & push if changed
