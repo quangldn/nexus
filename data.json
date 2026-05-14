@@ -1,47 +1,137 @@
 {
-  "lastEdited": "2026-05-13",
+  "lastEdited": "2026-05-14",
   "tabs": [
     {
       "id": "home",
       "name": "Homepage",
       "icon": "🏠",
-      "type": "boxes",
-      "links": [
+      "type": "blocks",
+      "layout": "2col",
+      "blocks": [
         {
-          "title": "ngCRM",
-          "subtitle": "Salesforce pipeline & cards",
-          "icon": "📊",
-          "url": "https://infinera.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Finfinera.lightning.force.com%252Flightning%252Fpage%252Fhome"
-        },
-        {
-          "title": "Seat Booking",
-          "subtitle": "Condeco office desk",
-          "icon": "🪑",
-          "url": "https://nokia.condecosoftware.com/master.aspx"
-        },
-        {
-          "title": "Nokia Me",
-          "subtitle": "HR portal",
+          "name": "Admin Links",
           "icon": "👤",
-          "url": "https://fa-evmr-saasfaprod1.fa.ocs.oraclecloud.com/fscmUI/faces/FuseWelcome?_afrLoop=1574663858130011&fnd=%3B%3B%3B%3Bfalse%3B256%3B%3B%3B&_adf.ctrl-state=fp3n8czon_117"
+          "column": "left",
+          "links": [
+            {
+              "title": "Nokia Me",
+              "subtitle": "HR portal",
+              "icon": "👤",
+              "url": "https://fa-evmr-saasfaprod1.fa.ocs.oraclecloud.com/fscmUI/faces/FuseWelcome?_afrLoop=1574663858130011&fnd=%3B%3B%3B%3Bfalse%3B256%3B%3B%3B&_adf.ctrl-state=fp3n8czon_117"
+            },
+            {
+              "title": "Seat Booking",
+              "subtitle": "Condeco office desk",
+              "icon": "🪑",
+              "url": "https://nokia.condecosoftware.com/master.aspx"
+            },
+            {
+              "title": "Xactly",
+              "subtitle": "Commission & comp",
+              "icon": "💵",
+              "url": "https://autheu.xactlycorp.com/sso/saml2"
+            },
+            {
+              "title": "Nokia Learn",
+              "subtitle": "Training portal (CSOD)",
+              "icon": "🎓",
+              "url": "https://nokialearn.csod.com/client/nokialearn/default.aspx"
+            }
+          ]
         },
         {
-          "title": "Xactly",
-          "subtitle": "Commission & comp",
-          "icon": "💵",
-          "url": "https://autheu.xactlycorp.com/sso/saml2"
+          "name": "SE Tools",
+          "icon": "🛠",
+          "column": "left",
+          "links": [
+            {
+              "title": "ngCRM",
+              "subtitle": "Salesforce pipeline & cards",
+              "icon": "📊",
+              "url": "https://infinera.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Finfinera.lightning.force.com%252Flightning%252Fpage%252Fhome"
+            },
+            {
+              "title": "NI-ON Sales Center",
+              "subtitle": "Optical sales portal",
+              "icon": "🌐",
+              "url": "https://nokia.sharepoint.com/sites/SalesCenter/SitePages/Optical-networks-equipment.aspx"
+            },
+            {
+              "title": "Nokia SharePoint",
+              "subtitle": "All SP sites",
+              "icon": "🗂",
+              "url": "https://nokia.sharepoint.com/_layouts/15/sharepoint.aspx"
+            },
+            {
+              "title": "ON VN Weekly Report",
+              "subtitle": "Power BI",
+              "icon": "📈",
+              "url": "https://app.powerbi.com/groups/me/reports/bac17047-f724-4a63-ae42-e3ff2f0d7c15/b338fa5c154571760e6f?ctid=5d471751-9675-428d-917b-70f44f9630b0&experience=power-bi"
+            },
+            {
+              "title": "Training & Webinars",
+              "subtitle": "EMEA ON Pre-Sales",
+              "icon": "🎓",
+              "url": "https://nokia.sharepoint.com/sites/EMEA_ON_PreSales/Trainings/Forms/Custom%20View.aspx?viewid=151d9e90%2De71d%2D49ec%2Da7d1%2D456b746d04e5&CT=1768354455672&OR=OWA%2DNT%2DMail&CID=ffacfa03%2D6bc0%2Dd0c5%2Df750%2D7e3925634f44&csf=1&FolderCTID=0x0120000B3AAF4FF4ABAD41813AF1480357FDB1"
+            }
+          ]
         },
         {
-          "title": "NI-ON Sales Center",
-          "subtitle": "Optical sales portal",
-          "icon": "🌐",
-          "url": "https://nokia.sharepoint.com/sites/SalesCenter/SitePages/Optical-networks-equipment.aspx"
+          "name": "Design Tools",
+          "icon": "🛠️",
+          "column": "right",
+          "links": [
+            {
+              "title": "WS-Planorama",
+              "subtitle": "Network planning",
+              "icon": "🗺",
+              "url": "https://ws-planorama.ext.net.nokia.com/"
+            },
+            {
+              "title": "TNPS",
+              "subtitle": "Project management (10.130.135.213)",
+              "icon": "📋",
+              "url": "https://10.130.135.213:31171/#/project-management"
+            },
+            {
+              "title": "TNDT",
+              "subtitle": "Local launcher (tndt.bat)",
+              "icon": "⚙️",
+              "local": true,
+              "url": "C:\\Users\\ledo\\OneDrive - Nokia\\03. RESOURCES\\04. TOOL\\tndt-6.4.1\\tndt-6.4.1\\bin\\tndt.bat"
+            }
+          ]
         },
         {
-          "title": "Nokia SharePoint",
-          "subtitle": "All SP sites",
-          "icon": "🗂️",
-          "url": "https://nokia.sharepoint.com/_layouts/15/sharepoint.aspx"
+          "name": "Competitive Landscape",
+          "icon": "🎯",
+          "column": "right",
+          "links": [
+            {
+              "title": "Market Intelligence",
+              "subtitle": "Hub (SharePoint)",
+              "icon": "📊",
+              "url": "https://nokia.sharepoint.com/sites/EMEA_ON_PreSales/Market%20intelligence?id=%2Fsites%2FEMEA%5FON%5FPreSales%2FMarket%20intelligence%2FCompetitive%20Intelligence&sortField=Modified&isAscending=false&viewid=12d9a79f%2D0aaf%2D495f%2Db152%2D13dec206463b&newTargetListUrl=https%3A%2F%2Fnokia%2Esharepoint%2Ecom%2Fsites%2FEMEA%5FON%5FPreSales%2FMarket%20intelligence"
+            },
+            {
+              "title": "Ciena",
+              "subtitle": "Aug 2025 deep dive",
+              "icon": "🟢",
+              "url": "https://nokia.sharepoint.com/:p:/r/sites/EMEA_ON_PreSales/Market%20intelligence/Competitive%20Intelligence/CIENA/2025-08-20%20Ciena%20Optical%20Portfolio%20%26%20Technology%20Competitive%20Deep%20Dive_presentation.pptx?d=w49010a850759489b972a2829e395ce05&csf=1&web=1&e=gy3rdb"
+            },
+            {
+              "title": "Ribbon",
+              "subtitle": "Feb 2026 deep dive",
+              "icon": "🟡",
+              "url": "https://nokia.sharepoint.com/:p:/r/sites/EMEA_ON_PreSales/Market%20intelligence/Competitive%20Intelligence/RIBBON%20(fka%20ECI)/2026-02%20Ribbon%20Optical%20Competitive%20Deep%20Dive.pptx?d=w4bb32ad8ab404cc9a59d2d919b2e4b41&csf=1&web=1&e=q5Jl0r"
+            },
+            {
+              "title": "Huawei",
+              "subtitle": "Sept 2025 deep dive",
+              "icon": "🔴",
+              "url": "https://nokia.sharepoint.com/:p:/r/sites/EMEA_ON_PreSales/Market%20intelligence/Competitive%20Intelligence/HUAWEI/2025-09%20Huawei%20Optical%20Competitive%20Deep%20Dive%20-%20September%202025.pptx?d=w1fffe42db1ef464eb2730fc99d78d5c6&csf=1&web=1&e=1iV0Sa"
+            }
+          ]
         }
       ]
     },
@@ -53,7 +143,109 @@
       "notionUrl": "https://www.notion.so/35e9e3a81ab380cfa7d4c425ed8ec194?v=35e9e3a81ab3807e9a2a000c9c681929",
       "syncWorkflowUrl": "https://github.com/quangldn/nexus/actions/workflows/notion-sync.yml",
       "heroTitle": "Product Wiki",
-      "heroText": "Snapshot of Document Vault. Auto-refreshed daily. Use sub-tabs to filter by product line."
+      "heroText": "Curated subpages for product lines · My Pins for ongoing prototyping · Notion-driven Home/Roadmap/Others.",
+      "curatedPages": {
+        "gx": {
+          "name": "1830 GX",
+          "icon": "📡",
+          "blocks": [
+            {
+              "name": "GX Introduction",
+              "icon": "ℹ️",
+              "links": [
+                { "title": "GX Exec Overview", "icon": "📙", "url": "https://onestore.nokia.com/#/21/item/93:2370" },
+                { "title": "GX Transponder Overview", "icon": "📙", "url": "https://onestore.nokia.com/#/21/item/93:2393" },
+                { "title": "GX OLS Overview", "icon": "📙", "url": "https://onestore.nokia.com/#/21/item/93:2392" }
+              ]
+            },
+            {
+              "name": "GX Ordering Guide",
+              "icon": "📦",
+              "links": [
+                { "title": "G30 PON List", "icon": "📗", "url": "https://nokia.sharepoint.com/:x:/s/ION_PM/Product_Communication/EQ7h5yNIY-dJpsUPv0Q-jNUB_7tqJ8scl9GvVlktLnOSjQ" },
+                { "title": "G40 PON List", "icon": "📗", "url": "https://nokia.sharepoint.com/:x:/s/ION_PM/Product_Communication/EXLAtLxfZYxKrrB-vT7AyFYBt3rsIS7Cfurt5bUn_BpstA" }
+              ]
+            },
+            {
+              "name": "GX Design Tools",
+              "icon": "🛠",
+              "links": [
+                { "title": "Power Draw Folder", "icon": "📁", "url": "https://nokia.sharepoint.com/sites/ION_PM/Product_Communication/SitePages/Home.aspx?RootFolder=%2Fsites%2FION_PM%2FProduct_Communication%2FShared+Documents%2F1830+GX+Info%2FGX+Power+Calculator&FolderCTID=0x0120009FEBBAEE431C6A408668F54670DE68F8&View=%7BC9D702F7-1A38-480F-BEF0-A5FD18110D00%7D&or=PPT-WEB.BODY.NT&ct=1778728222805" },
+                { "title": "GX PowerDraw R9.0_V1", "icon": "📗", "url": "https://nokia.sharepoint.com/sites/ION_PM/Product_Communication/Shared%20Documents/1830%20GX%20Info/GX%20Power%20Calculator/1830%20Global%20Express%20(GX)%20PowerDraw%20R9.0_V1.xlsx" }
+              ]
+            },
+            {
+              "name": "GX Deep Dive",
+              "icon": "🔬",
+              "links": [
+                { "title": "GX Protection", "subtitle": "L0 & L1 (25 Sept 2025)", "icon": "📙", "url": "https://nokianam.sharepoint.com/:p:/r/sites/smarter/_layouts/15/Doc.aspx?sourcedoc=%7B15345EF3-F6A8-4833-A2F2-10EFAAD6F511%7D&file=GX%20Protection%20L0%20%26%20L1_25th%20Sept-2025.pptx&action=edit&mobileredirect=true" },
+                { "title": "GX Security", "subtitle": "SE training (22 May 2025)", "icon": "📙", "url": "https://nokianam.sharepoint.com/:p:/r/sites/smarter/_layouts/15/Doc.aspx?sourcedoc=%7BAFB07804-8A28-491C-B380-021A51E3BF48%7D&file=GX%20Security%20SE%20training%2005222025.pptx&action=edit&mobileredirect=true" },
+                { "title": "R9.0 What's new", "icon": "📙", "url": "https://nokianam.sharepoint.com/:p:/r/sites/smarter/_layouts/15/Doc.aspx?sourcedoc=%7BB58955F1-4DE1-4A8C-B04F-A0489D6E0D33%7D&file=GX-R90-whats-new.pptx&action=edit&mobileredirect=true" },
+                { "title": "R8.1 Deep Dive", "icon": "📙", "url": "https://nokianam.sharepoint.com/:p:/r/sites/smarter/_layouts/15/Doc.aspx?sourcedoc=%7B502F3A0E-0746-4C5C-96BF-28BAE8B13134%7D&file=gx-r81-deep-dive.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "GX Roadmap", "subtitle": "Apr 2026 · Transcend v1.0", "icon": "🗺", "url": "https://nokia.sharepoint.com/sites/ION_PM/Roadmap/Published/_layouts/15/Doc.aspx?sourcedoc=%7B93C0D12D-75E6-4C3D-B5E7-BBD1212CBEF3%7D&file=ON%20Consolidated%20Roadmap%20Apr%202026%20-%20GX%20Transcend%20v1.0.pptx&action=edit&mobileredirect=true" }
+              ]
+            },
+            {
+              "name": "R9.0 CuDo",
+              "icon": "📄",
+              "links": [
+                { "title": "R9.0 GX G30 Release Notes", "icon": "📕", "local": true, "url": "C:\\Users\\ledo\\OneDrive - Nokia\\03. RESOURCES\\01. Optical Network\\01. 1830-GX\\01. Product Manuals\\R9.0_1830_GX_Documentation\\R9.0_GX_Release_Notes\\R9.0_GX_G30_Release_Notes.pdf" },
+                { "title": "R9.0 GX G40 Release Notes", "icon": "📕", "local": true, "url": "C:\\Users\\ledo\\OneDrive - Nokia\\03. RESOURCES\\01. Optical Network\\01. 1830-GX\\01. Product Manuals\\R9.0_1830_GX_Documentation\\R9.0_GX_Release_Notes\\R9.0_GX_G40_Release_Notes.pdf" },
+                { "title": "R9.0 1830 GX Documentation", "subtitle": "index.html", "icon": "📄", "local": true, "url": "C:\\Users\\ledo\\OneDrive - Nokia\\03. RESOURCES\\01. Optical Network\\01. 1830-GX\\01. Product Manuals\\R9.0_1830_GX_Documentation\\R9.0_1830_GX_Documentation\\index.html" }
+              ]
+            }
+          ]
+        },
+        "pss": {
+          "name": "1830 PSS",
+          "icon": "📡",
+          "blocks": [
+            {
+              "name": "PSS Introduction",
+              "icon": "ℹ️",
+              "links": [
+                { "title": "1830 PSS Overview", "subtitle": "including PSS-HC", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B507BCB00-FCC6-402B-A482-0EEAC986F339%7D&file=1830%20PSS%20Overview%20including%20PSS-HC.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "1830 PSD-200 Sales Presentation", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B376CADB4-5B5F-41E9-A3B6-A328F52B1C67%7D&file=1830%20PSD-200%20Sales%20Presentation.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "PSS Data Sheet", "subtitle": "PSS4II / PSS8 / PSS16II / PSS32", "icon": "📄", "url": "https://nokia.sharepoint.com/sites/OneStoreExt/marcoms/_layouts/15/viewer.aspx?sourcedoc={fcac8877-d88b-4b16-82e5-abb8443f9225}" },
+                { "title": "1830 PSS Transponders", "subtitle": "Technical details", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B5196024B-02A8-4939-B416-CD0633518226%7D&file=1830PSS%20Transponders%20Technical%20Details.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "Nokia 1830 PSS-HC Exec Overview", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B8D112800-5A96-45B3-B51D-BB5DDED97B27%7D&file=Nokia%201830%20PSS-HC%20Executive%20Overview.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "1830 PSS-x Cards", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B4632A7AD-6E26-4FD7-8A5B-93CC12F87BD3%7D&file=1830%20PSS-x%20Cards.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" }
+              ]
+            },
+            {
+              "name": "Roadmap",
+              "icon": "🗺",
+              "links": [
+                { "title": "PSI-M Subs 25.12 KT", "subtitle": "1830 PSS Knowledge Transfer", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/ION-GNPI/SET_Team/_layouts/15/Doc.aspx?sourcedoc=%7B499ECB19-2427-4398-B13D-4C89575FDB9A%7D&file=NI%20Optical%20Networks%201830%20PSS%20-%201830%20PSI-M%20-%20Subs%2025.12%20Knowledge%20Transfer.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "New in 1830 R26.6–R26.9", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B258B191C-F0A3-4C03-A2DD-2C2E28D29B7C%7D&file=New%20in%201830%20R26.6-R26.9.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "Fortnightly Roadmap Update", "subtitle": "BDM interlock folder", "icon": "📁", "url": "https://nokia.sharepoint.com/sites/ionapacrbc/opticalproductsandsolution/Regional%20PLM/Forms/AllItems.aspx?csf=1&web=1&e=gQ9bWl&CT=1778555617018&OR=OWA%2DNT%2DMail&CID=cd7ecc26%2Df886%2Df021%2D7b72%2D7220b2daef0c&FolderCTID=0x01200030118EDBD564C94B90382235F8BE9D35&id=%2Fsites%2Fionapacrbc%2Fopticalproductsandsolution%2FRegional%20PLM%2FMeetings%2FFortnightly%20BDM%20Interlock" }
+              ]
+            },
+            {
+              "name": "Deep Dive",
+              "icon": "🔬",
+              "links": [
+                { "title": "PSS GMPLS Overview & Deep Dive", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7BCAF34FFC-0FDE-4E7E-8043-05F9E0F434CB%7D&file=Nokia%201830%20PSS%20GMPLS%20Overview%20and%20Deep%20Dive.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" },
+                { "title": "1830PSS L0 GMPLS Presentation", "icon": "📙", "url": "https://nokianam.sharepoint.com/sites/CoxMetroTeam-NokiaProductFiles/_layouts/15/Doc.aspx?sourcedoc=%7BCEF5C334-C116-4DD0-8D64-A25B2E93E33F%7D&file=1830PSS%20L0%20GMPLS%20Presentation.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" }
+              ]
+            },
+            {
+              "name": "Ordering Guide",
+              "icon": "📦",
+              "links": [
+                { "title": "WaveSuite R25.12 Subscription Licensing", "subtitle": "RBC training", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/onestore/on/_layouts/15/Doc.aspx?sourcedoc=%7B062FF95F-F4DF-4571-BFA4-B5BED3E66333%7D&file=WaveSuite-R25.12-subscription-licensing-RBC-training.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" }
+              ]
+            },
+            {
+              "name": "WaveSuite",
+              "icon": "🌊",
+              "links": [
+                { "title": "WaveSuite R25.12 Knowledge Transfer", "subtitle": "ed1.0F · 16 Jan 2026", "icon": "📙", "url": "https://nokia.sharepoint.com/sites/EMEA_ON_PreSales/_layouts/15/Doc.aspx?sourcedoc=%7B3F484E24-0A50-4E0A-804E-6F3764C26A0A%7D&file=WaveSuite%20R25.12%20Knowledge%20Transfer%20ed1.0F%2016Jan2026.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1" }
+              ]
+            }
+          ]
+        }
+      }
     },
     {
       "id": "projects",
