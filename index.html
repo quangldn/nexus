@@ -427,6 +427,33 @@
   }
   .pin-item:hover .pin-x { opacity: 1; }
   .pin-x:hover { color: var(--danger); }
+  .pin-item.local { cursor: pointer; }
+  .pin-kind { font-size: 13px; opacity: 0.85; flex-shrink: 0; line-height: 1; }
+  .pin-add-form {
+    display: none; gap: 8px; align-items: center; flex-wrap: wrap;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 16px;
+  }
+  .pin-add-form.open { display: flex; }
+  .pin-add-form input[type=text], .pin-add-form select {
+    font: inherit; font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-strong); border-radius: 6px;
+    background: #fff; outline: none;
+    transition: border-color .12s;
+  }
+  .pin-add-form input[type=text] { flex: 1; min-width: 280px; }
+  .pin-add-form input[type=text]:focus,
+  .pin-add-form select:focus { border-color: var(--navy); }
+  .pin-add-form select { cursor: pointer; min-width: 160px; }
+  .pin-add-form .form-hint {
+    flex-basis: 100%; font-size: 11.5px; color: var(--muted);
+    margin-top: 2px; line-height: 1.5;
+  }
+  .pin-add-form .form-hint code {
+    background: #fff; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--border); font-size: 11px;
+  }
 
   /* Home: 2-column layout */
   .wiki-home {
@@ -1116,6 +1143,48 @@
         return (p.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
       } catch (e) { return 0; }
     }
+    // Detect whether a string is a web URL or a local Windows path.
+    // Supports: http(s)://, file:///C:/..., C:\..., \\server\share, with optional surrounding quotes.
+    function detectLinkKind(raw) {
+      let s = (raw || '').trim();
+      // strip surrounding quotes (Windows "Copy as path" wraps in ")
+      s = s.replace(/^["']+|["']+$/g, '').trim();
+      if (!s) return null;
+      if (/^https?:\/\//i.test(s)) return { kind: 'web', value: s };
+      if (/^file:\/\//i.test(s)) {
+        let p = decodeURIComponent(s.replace(/^file:\/+/i, ''));
+        if (/^[a-z]:/i.test(p)) p = p.replace(/\//g, '\\');
+        return { kind: 'local', value: p };
+      }
+      // Windows drive path  C:\... or C:/...
+      if (/^[a-z]:[\\\/]/i.test(s)) return { kind: 'local', value: s.replace(/\//g, '\\') };
+      // UNC path  \\server\share
+      if (/^\\\\/.test(s)) return { kind: 'local', value: s };
+      // Looks like a domain → assume web
+      if (/^[\w.-]+\.[a-z]{2,}([\/?#]|$)/i.test(s)) return { kind: 'web', value: 'https://' + s };
+      return { kind: 'web', value: s };
+    }
+    function localIcon(p) {
+      const lower = (p || '').toLowerCase();
+      if (/\.docx?$/.test(lower)) return '📘';
+      if (/\.(xlsx?|csv)$/.test(lower)) return '📗';
+      if (/\.pptx?$/.test(lower)) return '📙';
+      if (/\.pdf$/.test(lower)) return '📕';
+      if (/\.(bat|cmd|exe|ps1|sh)$/.test(lower)) return '⚙️';
+      if (/\.(txt|md|log|ini|cfg)$/.test(lower)) return '📝';
+      if (/\.(zip|7z|rar|tar|gz)$/.test(lower)) return '🗜️';
+      if (/\.(png|jpe?g|gif|bmp|webp|svg)$/.test(lower)) return '🖼️';
+      if (/\.(mp4|mov|avi|mkv)$/.test(lower)) return '🎬';
+      if (/\.(mp3|wav|flac|m4a)$/.test(lower)) return '🎵';
+      // Folder = no extension, or trailing slash/backslash
+      if (!/\.[a-z0-9]{1,5}$/i.test(p) || /[\\\/]$/.test(p)) return '📁';
+      return '📄';
+    }
+    function defaultLocalTitle(p) {
+      const clean = (p || '').replace(/[\\\/]+$/, '');
+      const seg = clean.split(/[\\\/]/).filter(Boolean).pop();
+      return seg || clean;
+    }
 
     // Dropdown selector
     const switcher = document.createElement('div');
@@ -1251,12 +1320,27 @@
       const toolbar = document.createElement('div');
       toolbar.className = 'pins-toolbar';
       toolbar.innerHTML = `
-        <button class="pins-btn" id="pins-add" type="button">+ Add block</button>
+        <button class="pins-btn" id="pins-addlink" type="button" title="Add a web link or a local file/folder path">+ Add link</button>
+        <button class="pins-btn ghost" id="pins-add" type="button">+ Add block</button>
         <button class="pins-btn ghost" id="pins-export" type="button" title="Download backup JSON (all pages)">⬇ Export</button>
         <button class="pins-btn ghost" id="pins-import" type="button" title="Restore from a backup JSON">⬆ Import</button>
-        <span class="pins-hint">Drag a tab from Edge onto a block to pin its URL.</span>
+        <span class="pins-hint">Drag a tab from Edge onto a block, or use + Add link for local files.</span>
       `;
       content.appendChild(toolbar);
+
+      const addForm = document.createElement('div');
+      addForm.className = 'pin-add-form';
+      addForm.innerHTML = `
+        <input type="text" id="pins-addlink-input" placeholder="Paste URL or path… e.g. https://… or C:\\Users\\… or \\\\server\\share" autocomplete="off" />
+        <input type="text" id="pins-addlink-title" placeholder="Title (optional)" style="flex: 0 1 200px; min-width: 140px;" />
+        <select id="pins-addlink-block"></select>
+        <button class="pins-btn" id="pins-addlink-go" type="button">Add</button>
+        <button class="pins-btn ghost" id="pins-addlink-cancel" type="button">Cancel</button>
+        <div class="form-hint">
+          Web: <code>https://...</code> · Local file: <code>C:\\path\\file.xlsx</code> (right-click in Explorer → <em>Copy as path</em>) · Folder: <code>C:\\path\\</code> · Network: <code>\\\\server\\share</code>. Local entries copy the path to clipboard on click (Edge blocks <code>file://</code> from HTTPS).
+        </div>
+      `;
+      content.appendChild(addForm);
 
       const grid = document.createElement('div');
       grid.className = 'pins-grid';
@@ -1408,19 +1492,34 @@
             list.appendChild(empty);
           } else {
             block.links.forEach(link => {
-              const a = document.createElement('a');
-              a.className = 'pin-item';
-              a.href = link.url;
-              a.target = '_blank';
-              a.rel = 'noopener';
+              const a = document.createElement(link.local ? 'button' : 'a');
+              a.className = 'pin-item' + (link.local ? ' local' : '');
+              if (link.local) {
+                a.type = 'button';
+              } else {
+                a.href = link.url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+              }
               a.draggable = true;
               a.dataset.linkId = link.id;
               a.dataset.search = ((link.title || '') + ' ' + (link.url || '') + ' ' + (link.host || '')).toLowerCase();
+              const kindIcon = link.local ? localIcon(link.url) : (link.icon || '🔗');
+              const hostLabel = link.local ? 'click to copy path' : (link.host || '');
               a.innerHTML = `
+                <span class="pin-kind">${escapeHtml(kindIcon)}</span>
                 <span class="pin-title" title="${escapeAttr(link.url)}">${escapeHtml(link.title || link.url)}</span>
-                <span class="pin-host">${escapeHtml(link.host || '')}</span>
+                <span class="pin-host">${escapeHtml(hostLabel)}</span>
                 <span class="pin-x" title="Remove">✕</span>
               `;
+              if (link.local) {
+                // Click on item (but not X) → copy path to clipboard. Edge blocks file:// links from HTTPS pages.
+                a.addEventListener('click', e => {
+                  if (e.target.closest('.pin-x')) return;
+                  e.preventDefault();
+                  copyToClipboard(link.url);
+                });
+              }
               // Rename on right-click / shift-click
               a.addEventListener('contextmenu', e => {
                 e.preventDefault();
@@ -1510,22 +1609,27 @@
 
             let added = 0;
             urls.forEach(u => {
+              const det = detectLinkKind(u);
+              if (!det) return;
               let host = '';
-              let defaultTitle = u;
-              try {
-                const parsed = new URL(u);
-                host = parsed.hostname.replace(/^www\./, '');
-                const lastSeg = parsed.pathname.split('/').filter(Boolean).pop();
-                defaultTitle = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
-              } catch (err) {
-                return; // not a valid URL, skip
+              let defaultTitle = det.value;
+              if (det.kind === 'web') {
+                try {
+                  const parsed = new URL(det.value);
+                  host = parsed.hostname.replace(/^www\./, '');
+                  const lastSeg = parsed.pathname.split('/').filter(Boolean).pop();
+                  defaultTitle = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
+                } catch (err) { return; }
+              } else {
+                defaultTitle = defaultLocalTitle(det.value);
               }
               block.links = block.links || [];
               block.links.push({
                 id: pinsUid('p_'),
                 title: titleFromHtml || defaultTitle,
-                url: u,
+                url: det.value,
                 host: host,
+                local: det.kind === 'local',
                 added: new Date().toISOString()
               });
               added++;
@@ -1554,6 +1658,94 @@
         savePins(state);
         paintPageBar();
         paint();
+      });
+
+      // === Add link form ===
+      const addLinkBtn = toolbar.querySelector('#pins-addlink');
+      const addInput = addForm.querySelector('#pins-addlink-input');
+      const addTitle = addForm.querySelector('#pins-addlink-title');
+      const addBlockSel = addForm.querySelector('#pins-addlink-block');
+      function refreshBlockSelect() {
+        const cur = currentPage();
+        addBlockSel.innerHTML = '';
+        (cur.blocks || []).forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          opt.textContent = '→ ' + (b.name || 'Untitled');
+          addBlockSel.appendChild(opt);
+        });
+        if (!cur.blocks || cur.blocks.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '__new__';
+          opt.textContent = '→ (creates "Quick links")';
+          addBlockSel.appendChild(opt);
+        }
+      }
+      function openAddForm() {
+        refreshBlockSelect();
+        addForm.classList.add('open');
+        addInput.value = '';
+        addTitle.value = '';
+        setTimeout(() => addInput.focus(), 0);
+      }
+      function closeAddForm() {
+        addForm.classList.remove('open');
+      }
+      function submitAddLink() {
+        const raw = addInput.value;
+        const det = detectLinkKind(raw);
+        if (!det) { showToast('Paste a URL or path first'); addInput.focus(); return; }
+        const cur = currentPage();
+        cur.blocks = cur.blocks || [];
+        let targetBlock;
+        if (addBlockSel.value === '__new__' || cur.blocks.length === 0) {
+          targetBlock = { id: pinsUid('b_'), name: 'Quick links', links: [] };
+          cur.blocks.push(targetBlock);
+        } else {
+          targetBlock = cur.blocks.find(b => b.id === addBlockSel.value) || cur.blocks[0];
+        }
+        let title = (addTitle.value || '').trim();
+        let host = '';
+        if (det.kind === 'web') {
+          try { host = new URL(det.value).hostname.replace(/^www\./, ''); } catch (e) {}
+          if (!title) {
+            try {
+              const u = new URL(det.value);
+              const lastSeg = u.pathname.split('/').filter(Boolean).pop();
+              title = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
+            } catch (e) { title = det.value; }
+          }
+        } else {
+          if (!title) title = defaultLocalTitle(det.value);
+        }
+        targetBlock.links = targetBlock.links || [];
+        targetBlock.links.push({
+          id: pinsUid('p_'),
+          title: title || det.value,
+          url: det.value,
+          host: host,
+          local: det.kind === 'local',
+          added: new Date().toISOString()
+        });
+        savePins(state);
+        refreshDropdownCount();
+        paintPageBar();
+        paint();
+        showToast((det.kind === 'local' ? 'Pinned local: ' : 'Pinned: ') + (title || det.value));
+        closeAddForm();
+      }
+      addLinkBtn.addEventListener('click', () => {
+        if (addForm.classList.contains('open')) closeAddForm(); else openAddForm();
+      });
+      addForm.querySelector('#pins-addlink-go').addEventListener('click', submitAddLink);
+      addForm.querySelector('#pins-addlink-cancel').addEventListener('click', closeAddForm);
+      addInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); submitAddLink(); }
+        else if (e.key === 'Escape') { e.preventDefault(); closeAddForm(); }
+      });
+      addTitle.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); submitAddLink(); }
+        else if (e.key === 'Escape') { e.preventDefault(); closeAddForm(); }
       });
       toolbar.querySelector('#pins-export').addEventListener('click', () => {
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
