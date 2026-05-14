@@ -6,6 +6,8 @@
 
 In an era where technology evolves through successive waves of innovation, optical networking has reached a critical juncture. For years, the industry has relied on coherent optical transmission to overcome the plateaus of the past, but today, we face the **Shannon Limit**—a theoretical maximum of spectral efficiency. As network operators grapple with exponential bandwidth growth, the need for a new approach that balances massive scale with environmental sustainability has never been more urgent. Nokia’s response to this challenge is the **sixth-generation super-coherent Photonic Service Engine (PSE-6s)**, a breakthrough designed to redefine the economics of global networks.
 
+![image](posts/images/3609e3a8/img-1.png)
+
 ## **The Technological Foundation: 5nm Silicon and CSTAR**
 
 At the heart of the PSE-6s is the industry’s most advanced optical technology. By harnessing **5-nanometer silicon integrated circuit technology**, Nokia has developed a coherent Digital Signal Processor (DSP) that pushes the boundaries of what is possible in a digital coherent optic (DCO) module. This DSP is closely integrated with **CSTAR silicon photonics**, enabling the PSE-6s to support the fastest wavelength speeds available today at **1.2Tb/s**.
