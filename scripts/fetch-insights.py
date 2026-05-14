@@ -14,7 +14,9 @@ import glob
 import json
 import os
 import re
+import shutil
 import sys
+import urllib.parse
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
@@ -132,8 +134,12 @@ def render_rich(rich_list):
 
 
 # === Block → markdown ===
-def block_inline(block, indent=0):
-    """Render a single block's own text (no children). Returns string or empty."""
+def block_inline(block, indent=0, image_handler=None):
+    """Render a single block's own text (no children). Returns string or empty.
+    `image_handler(url)` if provided is called for internal Notion `image` blocks
+    (file-type, signed URL); should return a local repo-relative path to use instead.
+    External images and other file types are left as-is.
+    """
     t = block.get('type')
     data = block.get(t, {})
     pad = '  ' * indent
@@ -175,8 +181,16 @@ def block_inline(block, indent=0):
         return '---'
 
     if t == 'image':
-        f = data.get('file') or data.get('external') or {}
-        url = f.get('url', '')
+        # Notion image block: type can be "file" (internal, signed expiring URL) or "external"
+        kind = data.get('type')
+        if kind == 'external':
+            url = (data.get('external') or {}).get('url', '')
+        else:
+            url = (data.get('file') or {}).get('url', '')
+            if url and image_handler:
+                local = image_handler(url)
+                if local:
+                    url = local
         caption = render_rich(data.get('caption', [])) or 'image'
         return f'![{caption}]({url})'
 
@@ -212,8 +226,9 @@ def block_inline(block, indent=0):
     return ''
 
 
-def render_blocks(blocks, indent=0):
-    """Render a flat list of blocks into one markdown string. Recurses into children."""
+def render_blocks(blocks, indent=0, image_handler=None):
+    """Render a flat list of blocks into one markdown string. Recurses into children.
+    `image_handler` is passed through to block_inline for internal images."""
     parts = []
     for block in blocks:
         t = block.get('type')
@@ -241,7 +256,7 @@ def render_blocks(blocks, indent=0):
             # Already handled by parent table; skip
             continue
 
-        md = block_inline(block, indent)
+        md = block_inline(block, indent, image_handler=image_handler)
         if md:
             parts.append(md)
 
@@ -251,7 +266,7 @@ def render_blocks(blocks, indent=0):
                 sub_indent = indent + 1 if t in (
                     'bulleted_list_item', 'numbered_list_item', 'to_do', 'toggle'
                 ) else indent
-                child_md = render_blocks(children, sub_indent)
+                child_md = render_blocks(children, sub_indent, image_handler=image_handler)
                 if child_md:
                     parts.append(child_md)
 
@@ -282,13 +297,51 @@ def transform(row):
 
 
 def clean_posts_dir():
-    """Delete all .md files in POSTS_DIR (auto-managed by sync)."""
+    """Delete all .md files and the images/ subdir in POSTS_DIR (auto-managed by sync)."""
     os.makedirs(POSTS_DIR, exist_ok=True)
     for f in glob.glob(os.path.join(POSTS_DIR, '*.md')):
         try:
             os.remove(f)
         except OSError as e:
             print(f'Warning: could not delete {f}: {e}', file=sys.stderr)
+    img_dir = os.path.join(POSTS_DIR, 'images')
+    if os.path.isdir(img_dir):
+        try:
+            shutil.rmtree(img_dir)
+        except OSError as e:
+            print(f'Warning: could not remove {img_dir}: {e}', file=sys.stderr)
+
+
+def download_image(url, dest_dir, base_name):
+    """Download an image (or any file) to dest_dir/base_name.<ext>.
+    Returns the local path (POSIX-style relative) on success, or None on failure.
+    """
+    if not url:
+        return None
+    os.makedirs(dest_dir, exist_ok=True)
+    # Derive extension from URL path (Notion signed URLs preserve filename)
+    ext = ''
+    try:
+        path = urllib.parse.urlparse(url).path
+        ext = os.path.splitext(path)[1].lower()
+        if len(ext) > 6:
+            ext = ''
+    except Exception:
+        ext = ''
+    if ext not in ('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.bmp', '.avif'):
+        ext = '.png'
+    filename = base_name + ext
+    local_path = os.path.join(dest_dir, filename)
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 nexus-sync'})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            with open(local_path, 'wb') as f:
+                f.write(resp.read())
+        # Return repo-relative POSIX path for markdown reference
+        return local_path.replace(os.sep, '/')
+    except Exception as e:
+        print(f'Image download failed for {url[:80]}…: {e}', file=sys.stderr)
+        return None
 
 
 def main():
@@ -302,14 +355,28 @@ def main():
         meta = transform(row)
         if not meta['title']:
             continue
+
+        # Per-page image handler: downloads internal Notion images to posts/images/<page-id-short>/
+        page_id_short = meta['id'][:8]
+        img_dir = os.path.join(POSTS_DIR, 'images', page_id_short)
+        img_counter = {'n': 0}
+        def make_handler(dest, counter):
+            def handler(url):
+                counter['n'] += 1
+                return download_image(url, dest, f'img-{counter["n"]}')
+            return handler
+        image_handler = make_handler(img_dir, img_counter)
+
         try:
             blocks = fetch_blocks(meta['_page_id'])
-            md_body = render_blocks(blocks)
+            md_body = render_blocks(blocks, image_handler=image_handler)
         except SystemExit:
             raise
         except Exception as e:
             print(f'Warning: failed to fetch blocks for "{meta["title"]}": {e}', file=sys.stderr)
             md_body = ''
+        if img_counter['n'] > 0:
+            print(f'  Downloaded {img_counter["n"]} image(s) for "{meta["title"]}".', file=sys.stderr)
 
         # Body file: title-h1 + summary blockquote + content
         body_parts = [f"# {meta['title']}"]
