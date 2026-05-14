@@ -1,6 +1,22 @@
 {
-  "lastSync": "pending first sync",
+  "lastSync": "2026-05-14 19:41 ICT",
   "source": "Notion — My Insights · Published (auto-synced)",
-  "count": 0,
-  "posts": []
+  "count": 1,
+  "posts": [
+    {
+      "id": "3609e3a81ab38039b265f41b980432fc",
+      "title": "Nokia PSE-6s: Scaling the Future of Optical Networking",
+      "summary": "Nokia’s sixth‑generation super‑coherent Photonic Service Engine (PSE‑6s) leverages 5 nm silicon and CSTAR silicon photonics to deliver up to 1.2 Tb/s per wavelength, 50 % higher capacity, and the ability to bond two wavelengths for 2.4 Tb/s transport, enabling single‑line‑card delivery of three 800 GE services and up to 25 % more fiber capacity. It extends 800 GE reach to 2 000 km—tripling current distances—while cutting interface count and eliminating many regenerators, and it reduces power per bit by 40 % and overall network power consumption by up to 60 % through greater efficiency and longer reach. Integrated telemetry and AI‑driven analytics provide real‑time monitoring, fault detection, and automated recovery, creating a smarter, more sustainable optical network for the growing 800 GE era.",
+      "tags": [
+        "Tech Recap",
+        "DSP",
+        "PSE-6s"
+      ],
+      "date": "2026-05-14",
+      "important": true,
+      "lastEdited": "2026-05-14T11:42:00.000Z",
+      "notionUrl": "https://www.notion.so/Nokia-PSE-6s-Scaling-the-Future-of-Optical-Networking-3609e3a81ab38039b265f41b980432fc",
+      "bodyFile": "posts/nokia-pse-6s-scaling-the-future-of-optic-3609e3a8.md"
+    }
+  ]
 }
