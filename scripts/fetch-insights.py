@@ -20,7 +20,7 @@ import urllib.error
 from datetime import datetime, timezone, timedelta
 
 NOTION_TOKEN = os.environ.get('NOTION_TOKEN')
-DATABASE_ID = '3609e3a8-1ab3-8082-8b52-000bebd71b48'  # My Insights data source
+DATABASE_ID = '3609e3a8-1ab3-80b0-88bd-f313b3229eec'  # My Insights wiki DB (from URL page ID)
 NOTION_VERSION = '2022-06-28'
 POSTS_DIR = os.environ.get('POSTS_DIR', 'posts')
 INDEX_PATH = os.environ.get('INDEX_PATH', 'notion-posts.json')
