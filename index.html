@@ -296,6 +296,47 @@
   }
 
   /* ===== My Pins (drag-drop scratchpad, localStorage) ===== */
+  .pages-bar {
+    display: flex; gap: 4px; align-items: center; flex-wrap: wrap;
+    padding-bottom: 10px; margin-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-tab {
+    padding: 7px 14px; border-radius: 8px 8px 0 0;
+    background: var(--panel-2); border: 1px solid var(--border);
+    cursor: pointer; font: inherit; font-size: 13px;
+    color: var(--muted); margin-bottom: -1px;
+    user-select: none; white-space: nowrap;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .page-tab:hover:not(.active) { background: var(--navy-soft); color: var(--navy); }
+  .page-tab.active {
+    background: #fff; color: var(--navy); font-weight: 600;
+    border-color: var(--border); border-bottom-color: #fff;
+  }
+  .page-tab .pg-count {
+    margin-left: 6px; font-size: 11px; opacity: 0.7;
+    font-weight: normal;
+  }
+  .page-add {
+    padding: 6px 12px; background: transparent;
+    border: 1px dashed var(--border-strong); border-radius: 8px;
+    color: var(--muted); cursor: pointer; font: inherit; font-size: 13px;
+    transition: color .12s, border-color .12s;
+  }
+  .page-add:hover { color: var(--navy); border-color: var(--navy); }
+  .page-actions {
+    margin-left: auto; display: flex; gap: 6px; align-items: center;
+  }
+  .page-action-btn {
+    font: inherit; font-size: 12px;
+    background: transparent; border: 1px solid var(--border-strong);
+    border-radius: 6px; padding: 5px 10px;
+    color: var(--muted); cursor: pointer;
+    transition: color .12s, border-color .12s;
+  }
+  .page-action-btn:hover { color: var(--navy); border-color: var(--navy); }
+  .page-action-btn.danger:hover { color: var(--danger); border-color: var(--danger); }
   .pins-toolbar {
     display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
     margin-bottom: 18px;
@@ -1018,19 +1059,47 @@
     ];
 
     // === My Pins state helpers (localStorage-only, Nokia laptop scratch-pad) ===
+    // State shape v2:
+    //   { pages: [{ id, name, blocks: [{ id, name, links: [...] }] }], activePage: 'pg_..' }
+    // Legacy shape v1 (auto-migrated): { blocks: [...] }
     const PINS_KEY = 'nexus.pins';
     const pinsUid = pfx => pfx + Math.random().toString(36).slice(2, 9);
+    function makeDefaultPage(name) {
+      return { id: pinsUid('pg_'), name: name || 'Homepage', blocks: [
+        { id: pinsUid('b_'), name: 'Quick links', links: [] }
+      ]};
+    }
+    function normalizePins(state) {
+      if (!state || !Array.isArray(state.pages) || state.pages.length === 0) {
+        const pg = makeDefaultPage('Homepage');
+        return { pages: [pg], activePage: pg.id };
+      }
+      // Ensure ids, names, blocks arrays
+      state.pages.forEach(pg => {
+        if (!pg.id) pg.id = pinsUid('pg_');
+        if (!pg.name) pg.name = 'Untitled';
+        if (!Array.isArray(pg.blocks)) pg.blocks = [];
+      });
+      if (!state.activePage || !state.pages.find(p => p.id === state.activePage)) {
+        state.activePage = state.pages[0].id;
+      }
+      return state;
+    }
     function loadPins() {
       try {
         const raw = localStorage.getItem(PINS_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.blocks)) return parsed;
+          if (parsed && Array.isArray(parsed.pages)) return normalizePins(parsed);
+          // Legacy v1 → migrate
+          if (parsed && Array.isArray(parsed.blocks)) {
+            const pg = { id: pinsUid('pg_'), name: 'Homepage', blocks: parsed.blocks };
+            return { pages: [pg], activePage: pg.id };
+          }
         }
       } catch (e) {}
-      return { blocks: [
-        { id: pinsUid('b_'), name: 'Quick links', links: [] }
-      ] };
+      const pg = makeDefaultPage('Homepage');
+      return { pages: [pg], activePage: pg.id };
     }
     function savePins(state) {
       try { localStorage.setItem(PINS_KEY, JSON.stringify(state)); } catch (e) {}
@@ -1040,6 +1109,10 @@
         const raw = localStorage.getItem(PINS_KEY);
         if (!raw) return 0;
         const p = JSON.parse(raw);
+        if (Array.isArray(p.pages)) {
+          return p.pages.reduce((s, pg) =>
+            s + (pg.blocks || []).reduce((s2, b) => s2 + (b.links || []).length, 0), 0);
+        }
         return (p.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
       } catch (e) { return 0; }
     }
@@ -1164,16 +1237,22 @@
       if (pinsOpt) pinsOpt.textContent = '📌 My Pins (' + pinsTotal() + ')';
     }
 
-    // ===== My Pins view: drag URL from any tab into a block. localStorage only. =====
+    // ===== My Pins view: multi-page drag-drop scratchpad. localStorage only. =====
     function renderPins() {
       content.innerHTML = '';
       let state = loadPins();
+      const currentPage = () => state.pages.find(p => p.id === state.activePage) || state.pages[0];
+
+      // Top: page tab bar
+      const pageBar = document.createElement('div');
+      pageBar.className = 'pages-bar';
+      content.appendChild(pageBar);
 
       const toolbar = document.createElement('div');
       toolbar.className = 'pins-toolbar';
       toolbar.innerHTML = `
         <button class="pins-btn" id="pins-add" type="button">+ Add block</button>
-        <button class="pins-btn ghost" id="pins-export" type="button" title="Download backup JSON">⬇ Export</button>
+        <button class="pins-btn ghost" id="pins-export" type="button" title="Download backup JSON (all pages)">⬇ Export</button>
         <button class="pins-btn ghost" id="pins-import" type="button" title="Restore from a backup JSON">⬆ Import</button>
         <span class="pins-hint">Drag a tab from Edge onto a block to pin its URL.</span>
       `;
@@ -1188,9 +1267,99 @@
         if (opt) opt.textContent = '📌 My Pins (' + pinsTotal() + ')';
       }
 
+      function paintPageBar() {
+        pageBar.innerHTML = '';
+        state.pages.forEach(pg => {
+          const tab = document.createElement('div');
+          tab.className = 'page-tab' + (pg.id === state.activePage ? ' active' : '');
+          const cnt = (pg.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+          tab.innerHTML = `${escapeHtml(pg.name)}<span class="pg-count">${cnt}</span>`;
+          tab.title = 'Click to switch · Double-click to rename';
+          tab.addEventListener('click', () => {
+            if (state.activePage === pg.id) return;
+            state.activePage = pg.id;
+            savePins(state);
+            paintPageBar();
+            paint();
+          });
+          tab.addEventListener('dblclick', () => {
+            const n = prompt('Rename page:', pg.name);
+            if (n !== null) {
+              pg.name = n.trim() || 'Untitled';
+              savePins(state);
+              paintPageBar();
+            }
+          });
+          pageBar.appendChild(tab);
+        });
+
+        const addPageBtn = document.createElement('button');
+        addPageBtn.className = 'page-add';
+        addPageBtn.type = 'button';
+        addPageBtn.textContent = '+ New page';
+        addPageBtn.addEventListener('click', () => {
+          const n = prompt('Page name:', 'New page');
+          if (n === null) return;
+          const newPg = { id: pinsUid('pg_'), name: n.trim() || 'Untitled', blocks: [] };
+          state.pages.push(newPg);
+          state.activePage = newPg.id;
+          savePins(state);
+          paintPageBar();
+          paint();
+        });
+        pageBar.appendChild(addPageBtn);
+
+        const actions = document.createElement('div');
+        actions.className = 'page-actions';
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'page-action-btn';
+        renameBtn.type = 'button';
+        renameBtn.textContent = '✏ Rename';
+        renameBtn.title = 'Rename current page';
+        renameBtn.addEventListener('click', () => {
+          const cur = currentPage();
+          if (!cur) return;
+          const n = prompt('Rename page:', cur.name);
+          if (n !== null) {
+            cur.name = n.trim() || 'Untitled';
+            savePins(state);
+            paintPageBar();
+          }
+        });
+        actions.appendChild(renameBtn);
+
+        const delPageBtn = document.createElement('button');
+        delPageBtn.className = 'page-action-btn danger';
+        delPageBtn.type = 'button';
+        delPageBtn.textContent = '🗑 Delete page';
+        delPageBtn.title = 'Delete current page';
+        delPageBtn.addEventListener('click', () => {
+          const cur = currentPage();
+          if (!cur) return;
+          if (state.pages.length === 1) {
+            showToast('Cannot delete the last page — add another first');
+            return;
+          }
+          const links = (cur.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+          const blocks = (cur.blocks || []).length;
+          if (!confirm(`Delete page "${cur.name}" (${blocks} block${blocks !== 1 ? 's' : ''}, ${links} pinned link${links !== 1 ? 's' : ''})?`)) return;
+          state.pages = state.pages.filter(p => p.id !== cur.id);
+          state.activePage = state.pages[0].id;
+          savePins(state);
+          refreshDropdownCount();
+          paintPageBar();
+          paint();
+        });
+        actions.appendChild(delPageBtn);
+        pageBar.appendChild(actions);
+      }
+
       function paint() {
         grid.innerHTML = '';
-        state.blocks.forEach(block => {
+        const cur = currentPage();
+        if (!cur) return;
+        cur.blocks = cur.blocks || [];
+        cur.blocks.forEach(block => {
           const bEl = document.createElement('div');
           bEl.className = 'pin-block';
           bEl.dataset.blockId = block.id;
@@ -1220,9 +1389,10 @@
               ? `Delete block "${block.name}" and its ${n} pinned link${n > 1 ? 's' : ''}?`
               : `Delete block "${block.name}"?`;
             if (confirm(msg)) {
-              state.blocks = state.blocks.filter(b => b.id !== block.id);
+              cur.blocks = cur.blocks.filter(b => b.id !== block.id);
               savePins(state);
               refreshDropdownCount();
+              paintPageBar();
               paint();
             }
           });
@@ -1267,6 +1437,7 @@
                 block.links = block.links.filter(l => l.id !== link.id);
                 savePins(state);
                 refreshDropdownCount();
+                paintPageBar();
                 paint();
               });
               a.addEventListener('dragstart', e => {
@@ -1296,13 +1467,13 @@
             e.preventDefault();
             bEl.classList.remove('drag-over');
 
-            // 1) Internal move between blocks
+            // 1) Internal move between blocks (within current page only)
             const internal = e.dataTransfer.getData('application/x-nexus-pin');
             if (internal) {
               try {
                 const { blockId, linkId } = JSON.parse(internal);
                 if (blockId === block.id) return;
-                const src = state.blocks.find(b => b.id === blockId);
+                const src = cur.blocks.find(b => b.id === blockId);
                 if (!src) return;
                 const idx = (src.links || []).findIndex(l => l.id === linkId);
                 if (idx < 0) return;
@@ -1362,6 +1533,7 @@
             if (added > 0) {
               savePins(state);
               refreshDropdownCount();
+              paintPageBar();
               paint();
               showToast('Pinned ' + added + ' link' + (added > 1 ? 's' : '') + ' to "' + (block.name || 'block') + '"');
             } else {
@@ -1372,11 +1544,15 @@
           grid.appendChild(bEl);
         });
       }
+      paintPageBar();
       paint();
 
       toolbar.querySelector('#pins-add').addEventListener('click', () => {
-        state.blocks.push({ id: pinsUid('b_'), name: 'New block', links: [] });
+        const cur = currentPage();
+        cur.blocks = cur.blocks || [];
+        cur.blocks.push({ id: pinsUid('b_'), name: 'New block', links: [] });
         savePins(state);
+        paintPageBar();
         paint();
       });
       toolbar.querySelector('#pins-export').addEventListener('click', () => {
@@ -1401,11 +1577,21 @@
           reader.onload = () => {
             try {
               const parsed = JSON.parse(reader.result);
-              if (!parsed || !Array.isArray(parsed.blocks)) throw new Error('Bad format');
+              let next;
+              if (parsed && Array.isArray(parsed.pages)) {
+                next = normalizePins(parsed);
+              } else if (parsed && Array.isArray(parsed.blocks)) {
+                // Legacy single-page shape
+                const pg = { id: pinsUid('pg_'), name: 'Imported', blocks: parsed.blocks };
+                next = { pages: [pg], activePage: pg.id };
+              } else {
+                throw new Error('Bad format');
+              }
               if (!confirm('Replace current pins with imported data?')) return;
-              state = parsed;
+              state = next;
               savePins(state);
               refreshDropdownCount();
+              paintPageBar();
               paint();
               showToast('Imported');
             } catch (e) {
