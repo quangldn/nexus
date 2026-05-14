@@ -172,6 +172,171 @@
     color: var(--navy); transform: translateX(2px);
   }
   .home-link.local .home-link-arrow::after { content: "📋"; margin-left: 4px; font-size: 11px; opacity: .75; }
+
+  /* ===== Insights (Knowledge Base) ===== */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  .insight-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px;
+    cursor: pointer;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: var(--shadow);
+    transition: box-shadow .15s, border-color .15s, transform .12s;
+    min-height: 160px;
+  }
+  .insight-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--navy);
+    transform: translateY(-2px);
+  }
+  .insight-card.important { border-left: 3px solid var(--navy-dark); }
+  .insight-card-title {
+    font-size: 15.5px; font-weight: 700;
+    color: var(--navy-dark);
+    line-height: 1.35;
+  }
+  .insight-card-title.important::before { content: "⭐ "; }
+  .insight-card-summary {
+    font-size: 13px; color: var(--text); opacity: .75;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+  .insight-card-meta {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: auto;
+    font-size: 11.5px; color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .insight-card-date { font-weight: 600; white-space: nowrap; }
+  .insight-card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
+  .insight-tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 10px;
+    background: var(--navy-soft); color: var(--navy-dark);
+    border: 1px solid rgba(18,65,145,.18);
+    font-weight: 500; white-space: nowrap;
+  }
+
+  /* Inline reader overlay + slide-in panel */
+  .reader-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,21,53,.42);
+    z-index: 50; opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .reader-overlay.open { opacity: 1; pointer-events: auto; }
+  .reader-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(840px, 94vw);
+    background: #fff;
+    box-shadow: -8px 0 40px rgba(0,21,53,.22);
+    z-index: 51;
+    transform: translateX(100%);
+    transition: transform .25s ease-out;
+    display: flex; flex-direction: column;
+  }
+  .reader-panel.open { transform: translateX(0); }
+  .reader-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-2);
+    flex-shrink: 0;
+  }
+  .reader-back, .reader-action {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 6px 12px;
+    font: inherit; font-size: 13px; color: var(--muted);
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: color .12s, border-color .12s, background .12s;
+  }
+  .reader-back:hover, .reader-action:hover {
+    color: var(--navy-dark); border-color: var(--navy); background: var(--navy-soft);
+  }
+  .reader-title-bar {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .reader-title-label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .reader-title-text {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .reader-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .reader-body {
+    flex: 1; overflow-y: auto;
+    padding: 36px 56px 80px;
+    line-height: 1.65; color: var(--text); font-size: 15px;
+  }
+  @media (max-width: 720px) { .reader-body { padding: 24px 22px 60px; } }
+  .reader-body h1 { font-size: 28px; margin: 0 0 14px; color: var(--navy-dark); line-height: 1.25; }
+  .reader-body h2 { font-size: 21px; margin: 30px 0 10px; color: var(--navy-dark); padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .reader-body h3 { font-size: 17px; margin: 22px 0 8px; color: var(--text); }
+  .reader-body h4 { font-size: 15px; margin: 18px 0 6px; color: var(--text); }
+  .reader-body p { margin: 10px 0 12px; }
+  .reader-body ul, .reader-body ol { padding-left: 24px; margin: 8px 0 14px; }
+  .reader-body li { margin: 5px 0; }
+  .reader-body li > p { margin: 4px 0; }
+  .reader-body code {
+    background: var(--panel-2); padding: 1px 6px; border-radius: 4px;
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 13px;
+    border: 1px solid var(--border);
+  }
+  .reader-body pre {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; overflow-x: auto;
+    margin: 14px 0; font-size: 13px;
+  }
+  .reader-body pre code { background: transparent; border: none; padding: 0; }
+  .reader-body blockquote {
+    border-left: 3px solid var(--navy); margin: 14px 0;
+    padding: 8px 18px; color: var(--text);
+    background: var(--navy-tint); border-radius: 0 8px 8px 0;
+  }
+  .reader-body blockquote p { margin: 4px 0; }
+  .reader-body a {
+    color: var(--navy); text-decoration: none;
+    border-bottom: 1px solid rgba(18,65,145,.3);
+    transition: border-color .12s;
+  }
+  .reader-body a:hover { border-bottom-color: var(--navy); }
+  .reader-body table {
+    border-collapse: collapse; width: 100%;
+    margin: 14px 0; font-size: 13.5px;
+  }
+  .reader-body th, .reader-body td {
+    border: 1px solid var(--border); padding: 8px 12px; text-align: left;
+    vertical-align: top;
+  }
+  .reader-body th {
+    background: var(--panel-2); font-weight: 700; color: var(--navy-dark);
+  }
+  .reader-body img { max-width: 100%; border-radius: 8px; }
+  .reader-body hr {
+    border: none; border-top: 1px solid var(--border); margin: 24px 0;
+  }
+  .reader-body input[type=checkbox] { margin-right: 6px; }
+  .reader-tags-row {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .reader-date-row {
+    color: var(--muted); font-size: 13px; margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .reader-loading, .reader-error {
+    padding: 60px 20px; text-align: center; color: var(--muted);
+  }
+  .reader-error { color: var(--danger); }
   .box {
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 14px; padding: 22px 18px 18px;
@@ -847,8 +1012,276 @@
     else if (t.type === 'list') frag.appendChild(renderList(t.groups || [{ name: '', links: t.links || [] }]));
     else if (t.type === 'notion') frag.appendChild(renderNotion(t));
     else if (t.type === 'documents') frag.appendChild(renderDocuments(t));
+    else if (t.type === 'insights') frag.appendChild(renderInsights(t));
     else frag.appendChild(renderList([{ name: '', links: t.links || [] }]));
     return frag;
+  }
+
+  // ===== Insights tab: Notion-driven knowledge base with inline reader =====
+  function renderInsights(t) {
+    const wrap = document.createElement('div');
+
+    const hero = document.createElement('div');
+    hero.className = 'notion-hero';
+    hero.innerHTML = `
+      <div class="hero-icon">💡</div>
+      <div class="hero-text">
+        <h2>${escapeHtml(t.heroTitle || 'Insights')}</h2>
+        <p>${escapeHtml(t.heroText || '')}</p>
+      </div>
+      <div class="hero-actions">
+        ${t.syncWorkflowUrl ? `<a href="${escapeAttr(t.syncWorkflowUrl)}" target="_blank" rel="noopener" class="hero-btn secondary">🔄 Run sync now</a>` : ''}
+        ${t.notionUrl ? `<a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>` : ''}
+      </div>
+    `;
+    wrap.appendChild(hero);
+
+    const content = document.createElement('div');
+    content.className = 'insights-content';
+    wrap.appendChild(content);
+
+    // Async load posts index
+    (async () => {
+      let posts = [];
+      let meta = null;
+      try {
+        const res = await fetch((t.indexFile || 'notion-posts.json') + '?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          meta = await res.json();
+          posts = meta.posts || [];
+        }
+      } catch (e) {}
+
+      if (!posts.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.innerHTML = `No insights yet.<br><br>Create a Knowledge Base DB in Notion (see <kbd>INSIGHTS-NOTION-SETUP.md</kbd>), publish a post, and trigger sync.`;
+        content.appendChild(empty);
+        return;
+      }
+
+      // Tag filter chips (multi-select OR)
+      const allTags = new Set();
+      posts.forEach(p => (p.tags || []).forEach(tg => allTags.add(tg)));
+
+      let activeTags = new Set();
+      try {
+        const sav = JSON.parse(localStorage.getItem('nexus.insightsFilter') || '[]');
+        activeTags = new Set(sav.filter(tg => allTags.has(tg)));
+      } catch (e) {}
+
+      const filterBar = document.createElement('div');
+      filterBar.className = 'filter-bar';
+      content.appendChild(filterBar);
+
+      const grid = document.createElement('div');
+      grid.className = 'insights-grid';
+      content.appendChild(grid);
+
+      function renderChips() {
+        filterBar.innerHTML = '<span class="filter-label">Tag:</span>';
+        [...allTags].sort().forEach(tg => {
+          const chip = document.createElement('span');
+          chip.className = 'filter-chip' + (activeTags.has(tg) ? ' active' : '');
+          chip.textContent = tg;
+          chip.addEventListener('click', () => {
+            activeTags.has(tg) ? activeTags.delete(tg) : activeTags.add(tg);
+            try { localStorage.setItem('nexus.insightsFilter', JSON.stringify([...activeTags])); } catch (e) {}
+            renderChips();
+            applyFilter();
+          });
+          filterBar.appendChild(chip);
+        });
+        if (activeTags.size > 0) {
+          const clear = document.createElement('span');
+          clear.className = 'filter-chip clear';
+          clear.textContent = '✕ Clear';
+          clear.addEventListener('click', () => {
+            activeTags.clear();
+            try { localStorage.removeItem('nexus.insightsFilter'); } catch (e) {}
+            renderChips();
+            applyFilter();
+          });
+          filterBar.appendChild(clear);
+        }
+      }
+      function applyFilter() {
+        const wanted = [...activeTags];
+        grid.querySelectorAll('.insight-card').forEach(card => {
+          if (wanted.length === 0) { card.classList.remove('hidden'); return; }
+          const tags = (card.dataset.tags || '').split('||').filter(Boolean);
+          const match = wanted.some(tg => tags.includes(tg));
+          card.classList.toggle('hidden', !match);
+        });
+      }
+
+      if (allTags.size > 0) renderChips();
+
+      // Sort: important first, then date DESC
+      const sorted = [...posts].sort((a, b) => {
+        if ((b.important ? 1 : 0) !== (a.important ? 1 : 0)) return (b.important ? 1 : 0) - (a.important ? 1 : 0);
+        return (b.date || '').localeCompare(a.date || '');
+      });
+
+      sorted.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'insight-card' + (p.important ? ' important' : '');
+        const search = ((p.title || '') + ' ' + (p.summary || '') + ' ' + (p.tags || []).join(' ')).toLowerCase();
+        card.dataset.search = search;
+        card.dataset.tags = (p.tags || []).join('||');
+        const tagsHtml = (p.tags || []).map(tg => `<span class="insight-tag">${escapeHtml(tg)}</span>`).join('');
+        const dateHtml = p.date ? `<span class="insight-card-date">${escapeHtml(p.date)}</span>` : '';
+        card.innerHTML = `
+          <div class="insight-card-title${p.important ? ' important' : ''}">${escapeHtml(p.title || 'Untitled')}</div>
+          <div class="insight-card-summary">${escapeHtml(p.summary || '')}</div>
+          <div class="insight-card-meta">
+            ${dateHtml}
+            <div class="insight-card-tags">${tagsHtml}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => openInsightReader(p, t.postsFolder || 'posts'));
+        grid.appendChild(card);
+      });
+
+      applyFilter();
+
+      if (meta && meta.lastSync) {
+        const sync = document.createElement('div');
+        sync.style.cssText = 'margin-top:14px;font-size:11.5px;color:var(--muted)';
+        sync.textContent = 'Last sync: ' + meta.lastSync + (meta.source ? ' · ' + meta.source : '');
+        content.appendChild(sync);
+      }
+    })();
+
+    return wrap;
+  }
+
+  // === Inline reader (slide-in panel) — used by Insights ===
+  let _markedLoadPromise = null;
+  function ensureMarked() {
+    if (window.marked) return Promise.resolve();
+    if (_markedLoadPromise) return _markedLoadPromise;
+    _markedLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Cannot load marked.js (CDN blocked?)'));
+      document.head.appendChild(s);
+    });
+    return _markedLoadPromise;
+  }
+
+  let _readerEls = null;
+  function ensureReader() {
+    if (_readerEls) return _readerEls;
+    const overlay = document.createElement('div');
+    overlay.className = 'reader-overlay';
+    document.body.appendChild(overlay);
+
+    const panel = document.createElement('div');
+    panel.className = 'reader-panel';
+    panel.innerHTML = `
+      <div class="reader-header">
+        <button class="reader-back" type="button">← Back</button>
+        <div class="reader-title-bar">
+          <div class="reader-title-label">Insights</div>
+          <div class="reader-title-text"></div>
+        </div>
+        <div class="reader-actions">
+          <a class="reader-action reader-notion-link" target="_blank" rel="noopener">Open in Notion ↗</a>
+        </div>
+      </div>
+      <div class="reader-body"></div>
+    `;
+    document.body.appendChild(panel);
+
+    const close = () => closeReader();
+    overlay.addEventListener('click', close);
+    panel.querySelector('.reader-back').addEventListener('click', close);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && panel.classList.contains('open')) close();
+    });
+
+    _readerEls = {
+      overlay, panel,
+      title: panel.querySelector('.reader-title-text'),
+      body: panel.querySelector('.reader-body'),
+      notionLink: panel.querySelector('.reader-notion-link')
+    };
+    return _readerEls;
+  }
+  function openReader() {
+    const e = ensureReader();
+    e.overlay.classList.add('open');
+    e.panel.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeReader() {
+    if (!_readerEls) return;
+    _readerEls.overlay.classList.remove('open');
+    _readerEls.panel.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  async function openInsightReader(post, postsFolder) {
+    const e = ensureReader();
+    e.title.textContent = post.title || '';
+    if (post.notionUrl) {
+      e.notionLink.href = post.notionUrl;
+      e.notionLink.style.display = '';
+    } else {
+      e.notionLink.style.display = 'none';
+    }
+    e.body.innerHTML = '<div class="reader-loading">Loading…</div>';
+    openReader();
+
+    let md = '';
+    try {
+      if (post.body) {
+        md = post.body;
+      } else if (post.bodyFile) {
+        const path = post.bodyFile;
+        const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching ' + path);
+        md = await res.text();
+      } else if (post.id) {
+        const path = (postsFolder || 'posts') + '/' + post.id + '.md';
+        const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching ' + path);
+        md = await res.text();
+      }
+    } catch (err) {
+      e.body.innerHTML = `<div class="reader-error">Failed to load: ${escapeHtml(err.message || String(err))}</div>`;
+      return;
+    }
+    if (!md) {
+      e.body.innerHTML = '<div class="reader-loading">No content yet. Click "Open in Notion" to view full page.</div>';
+      return;
+    }
+
+    try {
+      await ensureMarked();
+    } catch (err) {
+      // Fallback: show raw markdown as preformatted text
+      e.body.innerHTML = `
+        <div class="reader-error" style="margin-bottom: 12px; font-size: 12.5px;">marked.js failed to load — showing raw markdown.</div>
+        <pre style="white-space: pre-wrap;">${escapeHtml(md)}</pre>
+      `;
+      return;
+    }
+
+    const tagsHtml = (post.tags || []).length > 0
+      ? `<div class="reader-tags-row">${(post.tags || []).map(tg => `<span class="insight-tag">${escapeHtml(tg)}</span>`).join('')}</div>`
+      : '';
+    const dateHtml = post.date ? `<div class="reader-date-row">${escapeHtml(post.date)}</div>` : '';
+    const html = window.marked.parse(md, { gfm: true, breaks: false });
+    e.body.innerHTML = dateHtml + tagsHtml + html;
+    e.body.scrollTop = 0;
+
+    // Open external links in new tab
+    e.body.querySelectorAll('a[href]').forEach(a => {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
   }
 
   // Reusable: render a single "home-block" card from a {name, icon, links: [...]} definition.

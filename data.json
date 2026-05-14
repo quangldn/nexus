@@ -248,6 +248,18 @@
       }
     },
     {
+      "id": "insights",
+      "name": "Insights",
+      "icon": "💡",
+      "type": "insights",
+      "indexFile": "notion-posts.json",
+      "postsFolder": "posts",
+      "notionUrl": "https://www.notion.so/3609e3a81ab380b088bdf313b3229eec?v=3609e3a81ab3800ca5e5000ca2c82aac",
+      "syncWorkflowUrl": "https://github.com/quangldn/nexus/actions/workflows/notion-sync.yml",
+      "heroTitle": "Insights",
+      "heroText": "Tổng hợp & phân tích đã hoàn thành — từ Notion 'My Insights' DB. Click card để đọc inline. Auto-sync 8AM ICT mỗi ngày."
+    },
+    {
       "id": "projects",
       "name": "Projects",
       "icon": "📋",
