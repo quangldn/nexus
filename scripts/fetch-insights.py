@@ -270,7 +270,7 @@ def transform(row):
     return {
         '_page_id': page_id,
         'id': page_id.replace('-', ''),
-        'title': get_title(props.get('Tittle')),
+        'title': get_title(props.get('Title')),
         'summary': get_text(props.get('Summary')),
         'tags': get_multi_select(props.get('Tags')),
         'category': get_multi_select(props.get('Category')),
