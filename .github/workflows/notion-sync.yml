@@ -1,4 +1,4 @@
-name: Sync Notion projects
+name: Sync Notion (projects + insights)
 
 # Runs daily at 01:00 UTC = 08:00 Vietnam (ICT).
 # Also runnable on-demand from the Actions tab.
@@ -21,19 +21,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Fetch Notion data
+      - name: Fetch Notion projects (MY PROJECTS DB)
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: python scripts/fetch-notion.py
+
+      - name: Fetch Notion insights (My Insights DB)
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python scripts/fetch-insights.py
 
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add notion-projects.json
+          git add notion-projects.json notion-posts.json posts/
           if git diff --cached --quiet; then
             echo "No changes — nothing to commit."
           else
-            git commit -m "chore: auto-refresh Notion projects ($(TZ=Asia/Ho_Chi_Minh date +%Y-%m-%d))"
+            git commit -m "chore: auto-refresh Notion sync ($(TZ=Asia/Ho_Chi_Minh date +%Y-%m-%d))"
             git push
           fi
