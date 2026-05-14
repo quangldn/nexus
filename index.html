@@ -6,31 +6,66 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23124191'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='28' font-weight='800' fill='white'%3EN%3C/text%3E%3C/svg%3E" />
 <style>
+  /* ===== Nokia Pure web fonts (official brand kit, woff2 only) ===== */
+  @font-face {
+    font-family: 'Nokia Pure Headline';
+    src: url('fonts/NokiaPureHeadline_Bd.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Nokia Pure Headline';
+    src: url('fonts/NokiaPureHeadline_Rg.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Nokia Pure Text';
+    src: url('fonts/NokiaPureText_Rg.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Nokia Pure Text';
+    src: url('fonts/NokiaPureText_Md.woff2') format('woff2');
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Nokia Pure Text';
+    src: url('fonts/NokiaPureText_Bd.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+
   :root {
-    --navy: #124191;
-    --navy-dark: #001f5f;
-    --navy-deep: #001535;
-    --navy-soft: #e7ecf5;
-    --navy-tint: #f3f6fb;
+    /* Official Nokia 2026 palette (from brand kit theme1.xml) */
+    --brand-blue: #005AFF;    /* Nokia Bright Blue — primary accent, links, active states */
+    --navy: #005AFF;          /* alias for brand blue (used in existing rules) */
+    --navy-dark: #001135;     /* Nokia Dark Navy — headings, primary text */
+    --navy-deep: #000820;     /* very deep navy for hover/dark accents */
+    --navy-soft: #e6edff;     /* light brand blue tint for chips/hover bg */
+    --navy-tint: #f4f7ff;     /* even softer tint */
     --bg: #ffffff;
     --panel: #ffffff;
-    --panel-2: #f6f8fc;
-    --border: #e0e5ee;
-    --border-strong: #c9d1df;
-    --text: #1a1d24;
-    --muted: #5f6776;
-    --warn: #d97706;
-    --ok: #059669;
-    --danger: #dc2626;
-    --shadow: 0 1px 2px rgba(0,31,95,.04), 0 4px 12px rgba(0,31,95,.05);
-    --shadow-md: 0 2px 4px rgba(0,31,95,.06), 0 8px 24px rgba(0,31,95,.08);
+    --panel-2: #f7f8fa;
+    --border: #ebebeb;        /* Nokia Light Grey */
+    --border-strong: #d4d6db;
+    --text: #001135;          /* Nokia Dark Navy as body text */
+    --muted: #666666;         /* Nokia Grey */
+    --warn: #f47f31;          /* Nokia Orange */
+    --ok: #37cc73;            /* Nokia Green */
+    --danger: #e03dcd;        /* Nokia Pink */
+    --teal: #23abb6;
+    --purple: #7d33f2;
+    --shadow: 0 1px 2px rgba(0,17,53,.04), 0 4px 12px rgba(0,17,53,.05);
+    --shadow-md: 0 2px 4px rgba(0,17,53,.06), 0 8px 24px rgba(0,17,53,.08);
+    --font-text: 'Nokia Pure Text', -apple-system, 'Segoe UI', system-ui, sans-serif;
+    --font-headline: 'Nokia Pure Headline', 'Nokia Pure Text', -apple-system, 'Segoe UI', system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
     background: var(--bg); color: var(--text);
-    font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+    font: 14px/1.5 var(--font-text);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3, h4 { font-family: var(--font-headline); letter-spacing: -0.01em; }
   header {
     position: sticky; top: 0; z-index: 10;
     background: #fff;
@@ -41,16 +76,17 @@
     padding: 14px 32px; flex-wrap: wrap;
   }
   .brand { display: flex; align-items: center; gap: 14px; }
-  .logo-svg { height: 26px; display: block; }
-  .brand-divider { width: 1px; height: 22px; background: var(--border-strong); }
+  .logo-svg { height: 28px; width: auto; display: block; }
+  .brand-divider { width: 1px; height: 24px; background: var(--border-strong); }
   .app-name {
-    font-size: 18px; font-weight: 600; color: var(--navy-dark);
+    font-family: var(--font-headline);
+    font-size: 19px; font-weight: 700; color: var(--navy-dark);
     letter-spacing: -0.01em;
   }
   .app-tag {
-    font-size: 11px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    border: 1px solid var(--border); padding: 2px 7px; border-radius: 10px;
+    font-size: 10.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500;
+    border: 1px solid var(--border); padding: 3px 8px; border-radius: 10px;
     margin-left: 2px;
   }
   #search {
@@ -392,11 +428,41 @@
   .list-item .li-title { flex: 1; font-weight: 500; }
   .list-item .li-arrow { color: var(--muted); font-size: 14px; }
   .notion-hero {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--navy-dark) 100%);
     color: white; border-radius: 14px;
     padding: 28px 28px 24px;
     display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
     margin-bottom: 24px;
+  }
+  .notion-hero h2 { font-family: var(--font-headline); }
+
+  /* Sync actions moved to bottom of tab */
+  .tab-footer-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 36px; padding: 18px 0;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .tab-footer-actions .hero-btn {
+    background: var(--panel-2); color: var(--navy-dark);
+    border: 1px solid var(--border-strong);
+    padding: 9px 16px; border-radius: 8px;
+    text-decoration: none; font-weight: 500; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .12s;
+  }
+  .tab-footer-actions .hero-btn:hover {
+    border-color: var(--brand-blue); color: var(--brand-blue);
+    background: var(--navy-soft);
+    transform: translateY(-1px);
+  }
+  .tab-footer-actions .hero-btn.primary {
+    background: var(--brand-blue); color: white;
+    border-color: var(--brand-blue);
+  }
+  .tab-footer-actions .hero-btn.primary:hover {
+    background: var(--navy-deep); border-color: var(--navy-deep);
+    color: white;
   }
   .notion-hero h2 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
   .notion-hero p { margin: 0; opacity: 0.85; font-size: 13.5px; }
@@ -877,9 +943,7 @@
 <header>
   <div class="header-row">
     <div class="brand">
-      <svg class="logo-svg" viewBox="0 0 124 26" xmlns="http://www.w3.org/2000/svg" aria-label="Nokia">
-        <text x="0" y="20" font-family="Arial Black, 'Segoe UI', Arial, sans-serif" font-size="22" font-weight="900" fill="#001F5F" letter-spacing="2.5">NOKIA</text>
-      </svg>
+      <img class="logo-svg" src="assets/nokia-logo.svg" alt="Nokia" />
       <span class="brand-divider"></span>
       <span class="app-name">Nexus</span>
       <span class="app-tag">personal desk</span>
@@ -918,6 +982,21 @@
   }
   function escapeHtml(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function escapeAttr(s) { return escapeHtml(s); }
+  // Sync/Notion action buttons rendered at the BOTTOM of a tab (instead of in the hero).
+  function appendSyncFooter(wrap, t) {
+    if (!t.syncWorkflowUrl && !t.notionUrl) return;
+    const footer = document.createElement('div');
+    footer.className = 'tab-footer-actions';
+    let html = '';
+    if (t.syncWorkflowUrl) {
+      html += `<a href="${escapeAttr(t.syncWorkflowUrl)}" target="_blank" rel="noopener" class="hero-btn" title="Opens GitHub Actions in a new tab">🔄 Run sync now</a>`;
+    }
+    if (t.notionUrl) {
+      html += `<a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn primary">Open in Notion ↗</a>`;
+    }
+    footer.innerHTML = html;
+    wrap.appendChild(footer);
+  }
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add('show');
@@ -1029,16 +1108,14 @@
         <h2>${escapeHtml(t.heroTitle || 'Insights')}</h2>
         <p>${escapeHtml(t.heroText || '')}</p>
       </div>
-      <div class="hero-actions">
-        ${t.syncWorkflowUrl ? `<a href="${escapeAttr(t.syncWorkflowUrl)}" target="_blank" rel="noopener" class="hero-btn secondary">🔄 Run sync now</a>` : ''}
-        ${t.notionUrl ? `<a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>` : ''}
-      </div>
     `;
     wrap.appendChild(hero);
 
     const content = document.createElement('div');
     content.className = 'insights-content';
     wrap.appendChild(content);
+
+    appendSyncFooter(wrap, t);
 
     // Async load posts index
     (async () => {
@@ -1485,16 +1562,11 @@
     const hero = document.createElement('div');
     hero.className = 'notion-hero';
     const heroCount = notion && Array.isArray(notion.projects) ? notion.projects.length : 0;
-    const syncUrl = t.syncWorkflowUrl || '';
     hero.innerHTML = `
       <div class="hero-icon">📋</div>
       <div class="hero-text">
         <h2>${escapeHtml(t.heroTitle || 'Project Database')}${heroCount ? ` <span style="opacity:.7;font-weight:400;font-size:15px">· ${heroCount} active</span>` : ''}</h2>
         <p>${escapeHtml(t.heroText || 'Snapshot of your Notion DB. Open any row to jump into Notion.')}</p>
-      </div>
-      <div class="hero-actions">
-        ${syncUrl ? `<a href="${escapeAttr(syncUrl)}" target="_blank" rel="noopener" class="hero-btn secondary" title="Opens GitHub Actions">🔄 Run sync now</a>` : ''}
-        <a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>
       </div>
     `;
     wrap.appendChild(hero);
@@ -1581,6 +1653,7 @@
       empty.innerHTML = `No project snapshot yet.<br><br>Ask Claude on your personal laptop: <kbd>refresh Notion</kbd> — it will pull your DB and push an updated <kbd>notion-projects.json</kbd> to the repo.`;
       wrap.appendChild(empty);
     }
+    appendSyncFooter(wrap, t);
     return wrap;
   }
 
@@ -1636,16 +1709,11 @@
     const docCount = documents && Array.isArray(documents.documents) ? documents.documents.length : 0;
     const importantCount = documents && Array.isArray(documents.documents)
       ? documents.documents.filter(d => d.important).length : 0;
-    const syncUrl = t.syncWorkflowUrl || '';
     hero.innerHTML = `
       <div class="hero-icon">📚</div>
       <div class="hero-text">
         <h2>${escapeHtml(t.heroTitle || 'Product Wiki')}${docCount ? ` <span style="opacity:.7;font-weight:400;font-size:15px">· ${docCount} docs · ${importantCount} ⭐</span>` : ''}</h2>
         <p>${escapeHtml(t.heroText || 'Snapshot of Document Vault. Auto-refreshed daily.')}</p>
-      </div>
-      <div class="hero-actions">
-        ${syncUrl ? `<a href="${escapeAttr(syncUrl)}" target="_blank" rel="noopener" class="hero-btn secondary" title="Opens GitHub Actions">🔄 Run sync now</a>` : ''}
-        ${t.notionUrl ? `<a href="${escapeAttr(t.notionUrl)}" target="_blank" rel="noopener" class="hero-btn">Open in Notion →</a>` : ''}
       </div>
     `;
     wrap.appendChild(hero);
@@ -2417,6 +2485,7 @@
       wrap.appendChild(sync);
     }
 
+    appendSyncFooter(wrap, t);
     return wrap;
   }
 
