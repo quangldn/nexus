@@ -946,7 +946,7 @@
       <img class="logo-svg" src="assets/nokia-logo.svg" alt="Nokia" />
       <span class="brand-divider"></span>
       <span class="app-name">Nexus</span>
-      <span class="app-tag">personal desk</span>
+      <span class="app-tag">QUANGLDN</span>
     </div>
     <input id="search" type="search" placeholder="Search this tab…  (Ctrl+K)" autocomplete="off" />
     <span class="meta" id="meta"></span>
@@ -982,6 +982,543 @@
   }
   function escapeHtml(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function escapeAttr(s) { return escapeHtml(s); }
+  // ===== Pins/Docs storage helpers (key-parameterized, shared by My Pins view and My Docs tab) =====
+  const pinsUid = pfx => pfx + Math.random().toString(36).slice(2, 9);
+  function makeDefaultPinsPage(name) {
+    return { id: pinsUid('pg_'), name: name || 'Homepage', blocks: [
+      { id: pinsUid('b_'), name: 'Quick links', links: [] }
+    ]};
+  }
+  function normalizePinsState(state) {
+    if (!state || !Array.isArray(state.pages) || state.pages.length === 0) {
+      const pg = makeDefaultPinsPage('Homepage');
+      return { pages: [pg], activePage: pg.id };
+    }
+    state.pages.forEach(pg => {
+      if (!pg.id) pg.id = pinsUid('pg_');
+      if (!pg.name) pg.name = 'Untitled';
+      if (!Array.isArray(pg.blocks)) pg.blocks = [];
+    });
+    if (!state.activePage || !state.pages.find(p => p.id === state.activePage)) {
+      state.activePage = state.pages[0].id;
+    }
+    return state;
+  }
+  function loadPinsState(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.pages)) return normalizePinsState(parsed);
+        if (parsed && Array.isArray(parsed.blocks)) {
+          const pg = { id: pinsUid('pg_'), name: 'Homepage', blocks: parsed.blocks };
+          return { pages: [pg], activePage: pg.id };
+        }
+      }
+    } catch (e) {}
+    const pg = makeDefaultPinsPage('Homepage');
+    return { pages: [pg], activePage: pg.id };
+  }
+  function savePinsState(key, state) {
+    try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
+  }
+  function pinsTotalFor(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return 0;
+      const p = JSON.parse(raw);
+      if (Array.isArray(p.pages)) {
+        return p.pages.reduce((s, pg) =>
+          s + (pg.blocks || []).reduce((s2, b) => s2 + (b.links || []).length, 0), 0);
+      }
+      return (p.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+    } catch (e) { return 0; }
+  }
+  function detectLinkKind(raw) {
+    let s = (raw || '').trim();
+    s = s.replace(/^["']+|["']+$/g, '').trim();
+    if (!s) return null;
+    if (/^https?:\/\//i.test(s)) return { kind: 'web', value: s };
+    if (/^file:\/\//i.test(s)) {
+      let p = decodeURIComponent(s.replace(/^file:\/+/i, ''));
+      if (/^[a-z]:/i.test(p)) p = p.replace(/\//g, '\\');
+      return { kind: 'local', value: p };
+    }
+    if (/^[a-z]:[\\\/]/i.test(s)) return { kind: 'local', value: s.replace(/\//g, '\\') };
+    if (/^\\\\/.test(s)) return { kind: 'local', value: s };
+    if (/^[\w.-]+\.[a-z]{2,}([\/?#]|$)/i.test(s)) return { kind: 'web', value: 'https://' + s };
+    return { kind: 'web', value: s };
+  }
+  function localIcon(p) {
+    const lower = (p || '').toLowerCase();
+    if (/\.docx?$/.test(lower)) return '📘';
+    if (/\.(xlsx?|csv)$/.test(lower)) return '📗';
+    if (/\.pptx?$/.test(lower)) return '📙';
+    if (/\.pdf$/.test(lower)) return '📕';
+    if (/\.(bat|cmd|exe|ps1|sh)$/.test(lower)) return '⚙️';
+    if (/\.(txt|md|log|ini|cfg)$/.test(lower)) return '📝';
+    if (/\.(zip|7z|rar|tar|gz)$/.test(lower)) return '🗜️';
+    if (/\.(png|jpe?g|gif|bmp|webp|svg)$/.test(lower)) return '🖼️';
+    if (/\.(mp4|mov|avi|mkv)$/.test(lower)) return '🎬';
+    if (/\.(mp3|wav|flac|m4a)$/.test(lower)) return '🎵';
+    if (!/\.[a-z0-9]{1,5}$/i.test(p) || /[\\\/]$/.test(p)) return '📁';
+    return '📄';
+  }
+  function defaultLocalTitle(p) {
+    const clean = (p || '').replace(/[\\\/]+$/, '');
+    const seg = clean.split(/[\\\/]/).filter(Boolean).pop();
+    return seg || clean;
+  }
+
+  // ===== renderPinsUI: shared multi-page drag-drop scratchpad UI.
+  // Used by both Products Wiki → My Pins view AND My Docs tab.
+  // opts = { storageKey, onChange?, exportPrefix? }
+  function renderPinsUI(content, opts) {
+    const options = opts || {};
+    const STORAGE = options.storageKey || 'nexus.pins';
+    const ON_CHANGE = options.onChange || (() => {});
+    const EXPORT_PREFIX = options.exportPrefix || 'nexus-pins';
+    let state = loadPinsState(STORAGE);
+    const currentPage = () => state.pages.find(p => p.id === state.activePage) || state.pages[0];
+    const save = () => savePinsState(STORAGE, state);
+
+    const pageBar = document.createElement('div');
+    pageBar.className = 'pages-bar';
+    content.appendChild(pageBar);
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'pins-toolbar';
+    toolbar.innerHTML = `
+      <button class="pins-btn" data-act="addlink" type="button" title="Add a web link or a local file/folder path">+ Add link</button>
+      <button class="pins-btn ghost" data-act="addblock" type="button">+ Add block</button>
+      <button class="pins-btn ghost" data-act="export" type="button" title="Download backup JSON (all pages)">⬇ Export</button>
+      <button class="pins-btn ghost" data-act="import" type="button" title="Restore from a backup JSON">⬆ Import</button>
+      <span class="pins-hint">Drag a tab from Edge onto a block, or use + Add link for local files.</span>
+    `;
+    content.appendChild(toolbar);
+
+    const addForm = document.createElement('div');
+    addForm.className = 'pin-add-form';
+    addForm.innerHTML = `
+      <input type="text" data-fld="input" placeholder="Paste URL or path… e.g. https://… or C:\\Users\\… or \\\\server\\share" autocomplete="off" />
+      <input type="text" data-fld="title" placeholder="Title (optional)" style="flex: 0 1 200px; min-width: 140px;" />
+      <select data-fld="block"></select>
+      <button class="pins-btn" data-fld="go" type="button">Add</button>
+      <button class="pins-btn ghost" data-fld="cancel" type="button">Cancel</button>
+      <div class="form-hint">
+        Web: <code>https://...</code> · Local file: <code>C:\\path\\file.xlsx</code> (right-click in Explorer → <em>Copy as path</em>) · Folder: <code>C:\\path\\</code> · Network: <code>\\\\server\\share</code>. Local entries copy the path to clipboard on click (Edge blocks <code>file://</code> from HTTPS).
+      </div>
+    `;
+    content.appendChild(addForm);
+
+    const grid = document.createElement('div');
+    grid.className = 'pins-grid';
+    content.appendChild(grid);
+
+    function paintPageBar() {
+      pageBar.innerHTML = '';
+      state.pages.forEach(pg => {
+        const tab = document.createElement('div');
+        tab.className = 'page-tab' + (pg.id === state.activePage ? ' active' : '');
+        const cnt = (pg.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+        tab.innerHTML = `${escapeHtml(pg.name)}<span class="pg-count">${cnt}</span>`;
+        tab.title = 'Click to switch · Double-click to rename';
+        tab.addEventListener('click', () => {
+          if (state.activePage === pg.id) return;
+          state.activePage = pg.id;
+          save();
+          paintPageBar();
+          paint();
+        });
+        tab.addEventListener('dblclick', () => {
+          const n = prompt('Rename page:', pg.name);
+          if (n !== null) { pg.name = n.trim() || 'Untitled'; save(); paintPageBar(); }
+        });
+        pageBar.appendChild(tab);
+      });
+
+      const addPageBtn = document.createElement('button');
+      addPageBtn.className = 'page-add';
+      addPageBtn.type = 'button';
+      addPageBtn.textContent = '+ New page';
+      addPageBtn.addEventListener('click', () => {
+        const n = prompt('Page name:', 'New page');
+        if (n === null) return;
+        const newPg = { id: pinsUid('pg_'), name: n.trim() || 'Untitled', blocks: [] };
+        state.pages.push(newPg);
+        state.activePage = newPg.id;
+        save();
+        paintPageBar();
+        paint();
+      });
+      pageBar.appendChild(addPageBtn);
+
+      const actions = document.createElement('div');
+      actions.className = 'page-actions';
+      const renameBtn = document.createElement('button');
+      renameBtn.className = 'page-action-btn';
+      renameBtn.type = 'button';
+      renameBtn.textContent = '✏ Rename';
+      renameBtn.title = 'Rename current page';
+      renameBtn.addEventListener('click', () => {
+        const cur = currentPage();
+        if (!cur) return;
+        const n = prompt('Rename page:', cur.name);
+        if (n !== null) { cur.name = n.trim() || 'Untitled'; save(); paintPageBar(); }
+      });
+      actions.appendChild(renameBtn);
+
+      const delPageBtn = document.createElement('button');
+      delPageBtn.className = 'page-action-btn danger';
+      delPageBtn.type = 'button';
+      delPageBtn.textContent = '🗑 Delete page';
+      delPageBtn.title = 'Delete current page';
+      delPageBtn.addEventListener('click', () => {
+        const cur = currentPage();
+        if (!cur) return;
+        if (state.pages.length === 1) { showToast('Cannot delete the last page — add another first'); return; }
+        const links = (cur.blocks || []).reduce((s, b) => s + (b.links || []).length, 0);
+        const blocks = (cur.blocks || []).length;
+        if (!confirm(`Delete page "${cur.name}" (${blocks} block${blocks !== 1 ? 's' : ''}, ${links} pinned link${links !== 1 ? 's' : ''})?`)) return;
+        state.pages = state.pages.filter(p => p.id !== cur.id);
+        state.activePage = state.pages[0].id;
+        save();
+        ON_CHANGE();
+        paintPageBar();
+        paint();
+      });
+      actions.appendChild(delPageBtn);
+      pageBar.appendChild(actions);
+    }
+
+    function paint() {
+      grid.innerHTML = '';
+      const cur = currentPage();
+      if (!cur) return;
+      cur.blocks = cur.blocks || [];
+      cur.blocks.forEach(block => {
+        const bEl = document.createElement('div');
+        bEl.className = 'pin-block';
+        bEl.dataset.blockId = block.id;
+
+        const head = document.createElement('div');
+        head.className = 'pin-block-head';
+        const nameInput = document.createElement('input');
+        nameInput.className = 'pin-block-name';
+        nameInput.type = 'text';
+        nameInput.value = block.name || '';
+        nameInput.placeholder = 'Block name';
+        nameInput.addEventListener('change', () => { block.name = nameInput.value.trim() || 'Untitled'; save(); });
+        nameInput.addEventListener('dragstart', e => e.stopPropagation());
+        head.appendChild(nameInput);
+
+        const delBtn = document.createElement('span');
+        delBtn.className = 'pin-block-del';
+        delBtn.textContent = '🗑';
+        delBtn.title = 'Delete block';
+        delBtn.addEventListener('click', () => {
+          const n = (block.links || []).length;
+          const msg = n > 0
+            ? `Delete block "${block.name}" and its ${n} pinned link${n > 1 ? 's' : ''}?`
+            : `Delete block "${block.name}"?`;
+          if (confirm(msg)) {
+            cur.blocks = cur.blocks.filter(b => b.id !== block.id);
+            save(); ON_CHANGE(); paintPageBar(); paint();
+          }
+        });
+        head.appendChild(delBtn);
+        bEl.appendChild(head);
+
+        const list = document.createElement('div');
+        list.className = 'pin-list';
+        if (!block.links || block.links.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'pin-empty';
+          empty.textContent = 'Drop link here';
+          list.appendChild(empty);
+        } else {
+          block.links.forEach(link => {
+            const a = document.createElement(link.local ? 'button' : 'a');
+            a.className = 'pin-item' + (link.local ? ' local' : '');
+            if (link.local) { a.type = 'button'; }
+            else { a.href = link.url; a.target = '_blank'; a.rel = 'noopener'; }
+            a.draggable = true;
+            a.dataset.linkId = link.id;
+            a.dataset.search = ((link.title || '') + ' ' + (link.url || '') + ' ' + (link.host || '')).toLowerCase();
+            const kindIcon = link.local ? localIcon(link.url) : (link.icon || '🔗');
+            const hostLabel = link.local ? 'click to copy path' : (link.host || '');
+            a.innerHTML = `
+              <span class="pin-kind">${escapeHtml(kindIcon)}</span>
+              <span class="pin-title" title="${escapeAttr(link.url)}">${escapeHtml(link.title || link.url)}</span>
+              <span class="pin-host">${escapeHtml(hostLabel)}</span>
+              <span class="pin-x" title="Remove">✕</span>
+            `;
+            if (link.local) {
+              a.addEventListener('click', e => {
+                if (e.target.closest('.pin-x')) return;
+                e.preventDefault();
+                copyToClipboard(link.url);
+              });
+            }
+            a.addEventListener('contextmenu', e => {
+              e.preventDefault();
+              const nt = prompt('Rename link:', link.title || '');
+              if (nt !== null) { link.title = nt.trim() || link.url; save(); paint(); }
+            });
+            a.querySelector('.pin-x').addEventListener('click', e => {
+              e.preventDefault();
+              e.stopPropagation();
+              block.links = block.links.filter(l => l.id !== link.id);
+              save(); ON_CHANGE(); paintPageBar(); paint();
+            });
+            a.addEventListener('dragstart', e => {
+              e.dataTransfer.setData('application/x-nexus-pin', JSON.stringify({ blockId: block.id, linkId: link.id, storage: STORAGE }));
+              e.dataTransfer.effectAllowed = 'move';
+              a.classList.add('dragging');
+            });
+            a.addEventListener('dragend', () => a.classList.remove('dragging'));
+            list.appendChild(a);
+          });
+        }
+        bEl.appendChild(list);
+
+        bEl.addEventListener('dragover', e => {
+          e.preventDefault();
+          bEl.classList.add('drag-over');
+          const isInternal = e.dataTransfer.types.includes('application/x-nexus-pin');
+          e.dataTransfer.dropEffect = isInternal ? 'move' : 'copy';
+        });
+        bEl.addEventListener('dragleave', e => {
+          if (e.target === bEl || !bEl.contains(e.relatedTarget)) {
+            bEl.classList.remove('drag-over');
+          }
+        });
+        bEl.addEventListener('drop', e => {
+          e.preventDefault();
+          bEl.classList.remove('drag-over');
+
+          const internal = e.dataTransfer.getData('application/x-nexus-pin');
+          if (internal) {
+            try {
+              const payload = JSON.parse(internal);
+              // Only allow internal moves within the same storage (same tab)
+              if (payload.storage && payload.storage !== STORAGE) return;
+              if (payload.blockId === block.id) return;
+              const src = cur.blocks.find(b => b.id === payload.blockId);
+              if (!src) return;
+              const idx = (src.links || []).findIndex(l => l.id === payload.linkId);
+              if (idx < 0) return;
+              const [moved] = src.links.splice(idx, 1);
+              block.links = block.links || [];
+              block.links.push(moved);
+              save(); paint();
+            } catch (err) {}
+            return;
+          }
+
+          const uri = e.dataTransfer.getData('text/uri-list') || '';
+          const plain = e.dataTransfer.getData('text/plain') || '';
+          const html = e.dataTransfer.getData('text/html') || '';
+          const raw = uri || plain;
+          const urls = raw.split(/\r?\n/).map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+          if (urls.length === 0) { showToast('No URL detected in drop'); return; }
+
+          let titleFromHtml = '';
+          if (html) {
+            const m = html.match(/<a[^>]*>([\s\S]*?)<\/a>/i);
+            if (m) {
+              const tmp = document.createElement('div');
+              tmp.innerHTML = m[1];
+              titleFromHtml = (tmp.textContent || '').trim();
+            }
+          }
+
+          let added = 0;
+          urls.forEach(u => {
+            const det = detectLinkKind(u);
+            if (!det) return;
+            let host = '', defaultTitle = det.value;
+            if (det.kind === 'web') {
+              try {
+                const parsed = new URL(det.value);
+                host = parsed.hostname.replace(/^www\./, '');
+                const lastSeg = parsed.pathname.split('/').filter(Boolean).pop();
+                defaultTitle = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
+              } catch (err) { return; }
+            } else {
+              defaultTitle = defaultLocalTitle(det.value);
+            }
+            block.links = block.links || [];
+            block.links.push({
+              id: pinsUid('p_'),
+              title: titleFromHtml || defaultTitle,
+              url: det.value, host: host,
+              local: det.kind === 'local',
+              added: new Date().toISOString(),
+            });
+            added++;
+          });
+          if (added > 0) {
+            save(); ON_CHANGE(); paintPageBar(); paint();
+            showToast('Pinned ' + added + ' link' + (added > 1 ? 's' : '') + ' to "' + (block.name || 'block') + '"');
+          } else {
+            showToast('Could not parse a URL from the drop');
+          }
+        });
+
+        grid.appendChild(bEl);
+      });
+    }
+
+    paintPageBar();
+    paint();
+
+    toolbar.querySelector('[data-act="addblock"]').addEventListener('click', () => {
+      const cur = currentPage();
+      cur.blocks = cur.blocks || [];
+      cur.blocks.push({ id: pinsUid('b_'), name: 'New block', links: [] });
+      save(); paintPageBar(); paint();
+    });
+
+    // === Add link form wiring ===
+    const addLinkBtn = toolbar.querySelector('[data-act="addlink"]');
+    const addInput = addForm.querySelector('[data-fld="input"]');
+    const addTitle = addForm.querySelector('[data-fld="title"]');
+    const addBlockSel = addForm.querySelector('[data-fld="block"]');
+    function refreshBlockSelect() {
+      const cur = currentPage();
+      addBlockSel.innerHTML = '';
+      (cur.blocks || []).forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = '→ ' + (b.name || 'Untitled');
+        addBlockSel.appendChild(opt);
+      });
+      if (!cur.blocks || cur.blocks.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '__new__';
+        opt.textContent = '→ (creates "Quick links")';
+        addBlockSel.appendChild(opt);
+      }
+    }
+    function openAddForm() {
+      refreshBlockSelect();
+      addForm.classList.add('open');
+      addInput.value = ''; addTitle.value = '';
+      setTimeout(() => addInput.focus(), 0);
+    }
+    function closeAddForm() { addForm.classList.remove('open'); }
+    function submitAddLink() {
+      const det = detectLinkKind(addInput.value);
+      if (!det) { showToast('Paste a URL or path first'); addInput.focus(); return; }
+      const cur = currentPage();
+      cur.blocks = cur.blocks || [];
+      let targetBlock;
+      if (addBlockSel.value === '__new__' || cur.blocks.length === 0) {
+        targetBlock = { id: pinsUid('b_'), name: 'Quick links', links: [] };
+        cur.blocks.push(targetBlock);
+      } else {
+        targetBlock = cur.blocks.find(b => b.id === addBlockSel.value) || cur.blocks[0];
+      }
+      let title = (addTitle.value || '').trim();
+      let host = '';
+      if (det.kind === 'web') {
+        try { host = new URL(det.value).hostname.replace(/^www\./, ''); } catch (e) {}
+        if (!title) {
+          try {
+            const u = new URL(det.value);
+            const lastSeg = u.pathname.split('/').filter(Boolean).pop();
+            title = lastSeg ? decodeURIComponent(lastSeg).replace(/[-_+]/g, ' ') : host;
+          } catch (e) { title = det.value; }
+        }
+      } else {
+        if (!title) title = defaultLocalTitle(det.value);
+      }
+      targetBlock.links = targetBlock.links || [];
+      targetBlock.links.push({
+        id: pinsUid('p_'),
+        title: title || det.value,
+        url: det.value, host: host,
+        local: det.kind === 'local',
+        added: new Date().toISOString(),
+      });
+      save(); ON_CHANGE(); paintPageBar(); paint();
+      showToast((det.kind === 'local' ? 'Pinned local: ' : 'Pinned: ') + (title || det.value));
+      closeAddForm();
+    }
+    addLinkBtn.addEventListener('click', () => {
+      if (addForm.classList.contains('open')) closeAddForm(); else openAddForm();
+    });
+    addForm.querySelector('[data-fld="go"]').addEventListener('click', submitAddLink);
+    addForm.querySelector('[data-fld="cancel"]').addEventListener('click', closeAddForm);
+    addInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submitAddLink(); }
+      else if (e.key === 'Escape') { e.preventDefault(); closeAddForm(); }
+    });
+    addTitle.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submitAddLink(); }
+      else if (e.key === 'Escape') { e.preventDefault(); closeAddForm(); }
+    });
+    toolbar.querySelector('[data-act="export"]').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = EXPORT_PREFIX + '-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    });
+    toolbar.querySelector('[data-act="import"]').addEventListener('click', () => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'application/json,.json';
+      inp.addEventListener('change', () => {
+        const file = inp.files && inp.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            let next;
+            if (parsed && Array.isArray(parsed.pages)) {
+              next = normalizePinsState(parsed);
+            } else if (parsed && Array.isArray(parsed.blocks)) {
+              const pg = { id: pinsUid('pg_'), name: 'Imported', blocks: parsed.blocks };
+              next = { pages: [pg], activePage: pg.id };
+            } else { throw new Error('Bad format'); }
+            if (!confirm('Replace current data with imported?')) return;
+            state = next;
+            save(); ON_CHANGE(); paintPageBar(); paint();
+            showToast('Imported');
+          } catch (e) { showToast('Import failed: ' + (e.message || e)); }
+        };
+        reader.readAsText(file);
+      });
+      inp.click();
+    });
+  }
+
+  // ===== My Docs tab: localStorage-only personal docs scratch-pad (Nokia laptop). =====
+  function renderDocs(t) {
+    const wrap = document.createElement('div');
+    const hero = document.createElement('div');
+    hero.className = 'notion-hero';
+    hero.innerHTML = `
+      <div class="hero-icon">📁</div>
+      <div class="hero-text">
+        <h2>${escapeHtml(t.heroTitle || 'My Docs')}</h2>
+        <p>${escapeHtml(t.heroText || '')}</p>
+      </div>
+    `;
+    wrap.appendChild(hero);
+    const content = document.createElement('div');
+    wrap.appendChild(content);
+    renderPinsUI(content, { storageKey: 'nexus.docs', exportPrefix: 'nexus-docs' });
+    return wrap;
+  }
+
   // Sync/Notion action buttons rendered at the BOTTOM of a tab (instead of in the hero).
   function appendSyncFooter(wrap, t) {
     if (!t.syncWorkflowUrl && !t.notionUrl) return;
@@ -1092,6 +1629,7 @@
     else if (t.type === 'notion') frag.appendChild(renderNotion(t));
     else if (t.type === 'documents') frag.appendChild(renderDocuments(t));
     else if (t.type === 'insights') frag.appendChild(renderInsights(t));
+    else if (t.type === 'docs') frag.appendChild(renderDocs(t));
     else frag.appendChild(renderList([{ name: '', links: t.links || [] }]));
     return frag;
   }

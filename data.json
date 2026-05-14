@@ -260,6 +260,14 @@
       "heroText": "Tổng hợp & phân tích đã hoàn thành — từ Notion 'My Insights' DB. Click card để đọc inline. Auto-sync 8AM ICT mỗi ngày."
     },
     {
+      "id": "docs",
+      "name": "My Docs",
+      "icon": "📁",
+      "type": "docs",
+      "heroTitle": "My Docs",
+      "heroText": "Drag-drop scratch-pad cho các tài liệu local đang dùng hàng ngày (Word/Excel/PPT/folder/.bat). Lưu trên trình duyệt của Nokia laptop, không sync, không push GitHub."
+    },
+    {
       "id": "projects",
       "name": "Projects",
       "icon": "📋",
