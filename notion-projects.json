@@ -1,8 +1,15 @@
 {
-  "lastSync": "2026-06-21",
+  "lastSync": "2026-06-22",
   "source": "Notion — MY PROJECTS · NOKIA active (auto-synced)",
   "count": 17,
   "projects": [
+    {
+      "name": "DCI BIDV Exp 2026",
+      "status": "Business Development",
+      "priority": "Low",
+      "lastEdited": "2026-06-22T03:28:00.000Z",
+      "url": "https://app.notion.com/p/DCI-BIDV-Exp-2026-2f69e3a81ab38076b271d409a5b00339"
+    },
     {
       "name": "FTEL - Backbone 4",
       "status": "Business Development",
@@ -52,13 +59,6 @@
       "priority": "Low",
       "lastEdited": "2026-05-12T09:03:00.000Z",
       "url": "https://app.notion.com/p/APEC-Cross-Border-2f79e3a81ab380848924d21f9fe96df6"
-    },
-    {
-      "name": "DCI BIDV Exp 2026",
-      "status": "Business Development",
-      "priority": "Low",
-      "lastEdited": "2026-05-12T09:03:00.000Z",
-      "url": "https://app.notion.com/p/DCI-BIDV-Exp-2026-2f69e3a81ab38076b271d409a5b00339"
     },
     {
       "name": "FTEL DCI Q7 Q9",
