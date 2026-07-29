@@ -1,8 +1,16 @@
 {
-  "lastSync": "2026-07-28",
+  "lastSync": "2026-07-29",
   "source": "Notion — MY PROJECTS · NOKIA active (auto-synced)",
-  "count": 17,
+  "count": 11,
   "projects": [
+    {
+      "name": "FTEL GPON Engagement",
+      "status": "Bid Awarded",
+      "priority": "Low",
+      "customer": "FPT Telecom",
+      "lastEdited": "2026-07-28T08:35:00.000Z",
+      "url": "https://app.notion.com/p/FTEL-GPON-Engagement-2429e3a81ab38002a653fc9756e6cce7"
+    },
     {
       "name": "FTEL - Backbone 4",
       "status": "Business Development",
@@ -22,14 +30,6 @@
       "url": "https://app.notion.com/p/DCI-BIDV-Exp-2026-2f69e3a81ab38076b271d409a5b00339"
     },
     {
-      "name": "Review Hồ sơ H04",
-      "status": "Business Development",
-      "priority": "Low",
-      "keyUpdate": "01-Jan: Currently Pending due to Mobifone - Arista noise to influence for the IPoDWDM architecture",
-      "lastEdited": "2026-05-12T09:04:00.000Z",
-      "url": "https://app.notion.com/p/Review-H-s-H04-2b29e3a81ab380b1b777e95ed491b954"
-    },
-    {
       "name": "HCMC Railway Metro",
       "status": "Business Development",
       "priority": "Medium",
@@ -37,28 +37,11 @@
       "url": "https://app.notion.com/p/HCMC-Railway-Metro-32f9e3a81ab3805ca093cb3e579dfe36"
     },
     {
-      "name": "UBND TP HCM Metro Network",
-      "status": "Business Development",
-      "priority": "Medium",
-      "lineSystem": "IP Network",
-      "bom": "Budgetary",
-      "projectType": "Green Field",
-      "lastEdited": "2026-05-12T09:03:00.000Z",
-      "url": "https://app.notion.com/p/UBND-TP-HCM-Metro-Network-2e79e3a81ab3801e87edd4cd40341166"
-    },
-    {
       "name": "VNPT Central Backhaul",
       "status": "Business Development",
       "priority": "Medium",
       "lastEdited": "2026-05-12T09:03:00.000Z",
       "url": "https://app.notion.com/p/VNPT-Central-Backhaul-3499e3a81ab3808e96e8d97d7ac465cd"
-    },
-    {
-      "name": "APEC Cross Border",
-      "status": "Business Development",
-      "priority": "Low",
-      "lastEdited": "2026-05-12T09:03:00.000Z",
-      "url": "https://app.notion.com/p/APEC-Cross-Border-2f79e3a81ab380848924d21f9fe96df6"
     },
     {
       "name": "FTEL DCI Q7 Q9",
@@ -108,47 +91,6 @@
       "priority": "Low",
       "lastEdited": "2026-01-31T00:26:00.000Z",
       "url": "https://app.notion.com/p/NOKIA-GENERAL-1fa9e3a81ab38108ae27de9f3871970a"
-    },
-    {
-      "name": "DCI - Tổng cục thuế",
-      "status": "Business Development",
-      "priority": "Low",
-      "customer": "MOF",
-      "lineSystem": "1830-PSS",
-      "bom": "Budgetary",
-      "projectType": "Green Field",
-      "keyUpdate": "26-Jan: Quotation shared to EU",
-      "lastEdited": "2026-01-31T00:24:00.000Z",
-      "url": "https://app.notion.com/p/DCI-T-ng-c-c-thu-2f39e3a81ab38046b5eac82b9814d403"
-    },
-    {
-      "name": "FTEL GPON Engagement",
-      "status": "Business Development",
-      "priority": "Low",
-      "customer": "FPT Telecom",
-      "lastEdited": "2026-01-31T00:24:00.000Z",
-      "url": "https://app.notion.com/p/FTEL-GPON-Engagement-2429e3a81ab38002a653fc9756e6cce7"
-    },
-    {
-      "name": "FTEL XR Development",
-      "status": "Business Development",
-      "priority": "Medium",
-      "customer": "FPT Telecom",
-      "lineSystem": "XTM",
-      "bom": "BoM Review",
-      "projectType": "Green Field",
-      "description": "Engage with INF MB for the XR applications in the Metro - Aggregation network segment",
-      "lastEdited": "2026-01-31T00:23:00.000Z",
-      "url": "https://app.notion.com/p/FTEL-XR-Development-1fa9e3a81ab381278c91e21a5927d6d7"
-    },
-    {
-      "name": "MOPS Unified Network Infrastructure",
-      "status": "Business Development",
-      "priority": "Medium",
-      "customer": "MoPS, FPT Telecom, Mobifone",
-      "projectType": "Consultant",
-      "lastEdited": "2026-01-26T13:21:00.000Z",
-      "url": "https://app.notion.com/p/MOPS-Unified-Network-Infrastructure-23e9e3a81ab380ac978ccc43c70a2f5d"
     }
   ]
 }
