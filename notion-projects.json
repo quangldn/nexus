@@ -1,16 +1,8 @@
 {
-  "lastSync": "2026-07-29",
+  "lastSync": "2026-07-30",
   "source": "Notion — MY PROJECTS · NOKIA active (auto-synced)",
   "count": 11,
   "projects": [
-    {
-      "name": "FTEL GPON Engagement",
-      "status": "Bid Awarded",
-      "priority": "Low",
-      "customer": "FPT Telecom",
-      "lastEdited": "2026-07-28T08:35:00.000Z",
-      "url": "https://app.notion.com/p/FTEL-GPON-Engagement-2429e3a81ab38002a653fc9756e6cce7"
-    },
     {
       "name": "FTEL - Backbone 4",
       "status": "Business Development",
@@ -19,8 +11,16 @@
       "bom": "Budgetary",
       "projectType": "Green Field",
       "keyUpdate": "26-Jan: \nMinh asked for the network information for the actual design. \nNPI is working on the POC Material",
-      "lastEdited": "2026-07-20T10:17:00.000Z",
+      "lastEdited": "2026-07-30T03:18:00.000Z",
       "url": "https://app.notion.com/p/FTEL-Backbone-4-26e9e3a81ab38080b64ed609cca81585"
+    },
+    {
+      "name": "FTEL GPON Engagement",
+      "status": "Bid Awarded",
+      "priority": "Low",
+      "customer": "FPT Telecom",
+      "lastEdited": "2026-07-28T08:35:00.000Z",
+      "url": "https://app.notion.com/p/FTEL-GPON-Engagement-2429e3a81ab38002a653fc9756e6cce7"
     },
     {
       "name": "DCI BIDV Exp 2026",
