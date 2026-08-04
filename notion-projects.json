@@ -1,8 +1,15 @@
 {
-  "lastSync": "2026-08-03",
+  "lastSync": "2026-08-04",
   "source": "Notion — MY PROJECTS · NOKIA active (auto-synced)",
-  "count": 11,
+  "count": 12,
   "projects": [
+    {
+      "name": "Hyperscaler BD",
+      "status": "Business Development",
+      "description": "Business development mảng hyperscaler (Microsoft, v.v.) — AI WANs, DCI, hạ tầng cho data center operators.",
+      "lastEdited": "2026-08-03T23:47:00.000Z",
+      "url": "https://app.notion.com/p/Hyperscaler-BD-3b19e3a81ab381e3b166c4a22ae34017"
+    },
     {
       "name": "FTEL - Backbone 4",
       "status": "Business Development",
